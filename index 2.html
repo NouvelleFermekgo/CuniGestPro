@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f4a38">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ferme Pro">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Nouvelle Ferme Cuniculture Pro</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Concept : carnet de ferme sur téléphone. Barre d'onglets en bas, feuilles de saisie qui montent du bas, vert forêt + jaune paille. */
+:root{
+  --bg:#f2f4ef;--surface:#fbfcf9;--ink:#14231c;--muted:#5c6b62;--line:#d9dfd5;
+  --brand:#0f4a38;--brand-ink:#ffffff;--accent:#d99a00;--tint:#e4ebe2;
+  --good:#2f7d4f;--warn:#a86400;--bad:#b3372b;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1713;--surface:#15221c;--ink:#e8efe9;--muted:#96a89d;--line:#26362e;
+  --brand:#6fcf9f;--brand-ink:#08231a;--accent:#f0b429;--tint:#1c2c24;
+  --good:#6fcf9f;--warn:#f0b429;--bad:#ff8a7a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1713;--surface:#15221c;--ink:#e8efe9;--muted:#96a89d;--line:#26362e;
+  --brand:#6fcf9f;--brand-ink:#08231a;--accent:#f0b429;--tint:#1c2c24;
+  --good:#6fcf9f;--warn:#f0b429;--bad:#ff8a7a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.45 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding-block:0 96px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding:12px 0 10px;border-bottom:1px solid var(--line)}
+header.top .name{flex:1;min-width:0}
+header.top h1{font-size:18px;font-weight:800}
+header.top .sub{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block}
+.dot.off{background:var(--warn)}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.tabs button{border:0;background:none;padding:6px 2px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted)}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="true"]{color:var(--brand);background:var(--tint)}
+section.blk{margin-top:18px}
+.h2row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.h2row h2{font-size:17px;font-weight:800}
+.small{font-size:12.5px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:10px;justify-content:space-between;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.row .main{min-width:0;flex:1}
+.row .t{font-weight:700;overflow-wrap:anywhere}
+.row .s{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.row .end{text-align:right;font-weight:700;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.1;overflow-wrap:anywhere}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:2px}
+.kpi.hero{grid-column:1/-1;background:var(--brand);color:var(--brand-ink);border-color:transparent}
+.kpi.hero .l{color:inherit;opacity:.8}
+.kpi.hero .v{font-size:40px}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--tint);color:var(--ink);white-space:nowrap}
+.pill.good{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.seg{display:flex;gap:4px;background:var(--tint);padding:4px;border-radius:12px;margin-top:14px;overflow-x:auto}
+.seg button{flex:1;border:0;background:none;padding:8px 10px;border-radius:9px;font-weight:600;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.filters{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.filters select{flex:1;min-width:120px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;font-weight:700;min-height:44px}
+.btn.pri{background:var(--brand);color:var(--brand-ink);border-color:transparent}
+.btn.dng{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,var(--line))}
+.btn.sm{padding:6px 10px;min-height:36px;font-size:13px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:5;
+  background:var(--accent);color:#1a1300;border:0;border-radius:999px;padding:0 20px;height:50px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+input,select,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{min-height:72px;resize:vertical}
+label.f{display:block;margin-top:12px;font-size:13px;font-weight:600}
+label.f .hint{font-weight:400;color:var(--muted)}
+label.f input,label.f select,label.f textarea{margin-top:4px;font-weight:400}
+label.chk{display:flex;gap:10px;align-items:center;margin-top:14px;font-weight:600}
+label.chk input{width:22px;height:22px;min-height:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#sheet{position:fixed;inset:0;z-index:20;display:none}
+#sheet.open{display:block}
+#sheet .back{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+#sheet .pane{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow:auto;background:var(--bg);border-radius:20px 20px 0 0;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));max-width:640px;margin:0 auto}
+#sheet .pane h2{font-size:20px;font-weight:800;margin-bottom:4px}
+.banner{margin-top:12px;border:1px dashed var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent);border-radius:12px;padding:10px 12px;font-size:13px}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);border-left-width:4px}
+.alert.warn{border-left-color:var(--warn)}.alert.bad{border-left-color:var(--bad)}.alert.good{border-left-color:var(--good)}.alert.info{border-left-color:var(--brand)}
+.bar{height:8px;border-radius:99px;background:var(--tint);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:99px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.scroll-x{overflow-x:auto}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:var(--muted)}
+.kv span:last-child{font-weight:700;text-align:right;overflow-wrap:anywhere}
+.empty{text-align:center;color:var(--muted);padding:22px 10px;border:1px dashed var(--line);border-radius:14px}
+.chart text{fill:var(--muted);font:11px var(--body)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;max-width:90%}
+@media (prefers-reduced-motion:no-preference){#sheet.open .pane{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="name"><h1>Nouvelle Ferme</h1><div class="sub"><span class="dot" id="dot"></span><span id="status">Données sur cet appareil</span></div></div>
+    <button class="icon-btn" id="gear" aria-label="Paramètres et sauvegarde">⚙</button>
+  </header>
+  <main id="view"></main>
+</div>
+<nav class="tabs" id="tabs"></nav>
+<div id="sheet"><div class="back" id="sheetBack"></div><div class="pane" id="pane" role="dialog" aria-modal="true"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){'use strict';
+var KEY='nfcp-pro-v1',storageOk=true;
+/* ---------- utilitaires ---------- */
+function uid(p){return p+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3)}
+function pad(n){return n<10?'0'+n:''+n}
+function iso(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function today(){return iso(new Date())}
+function addDays(s,n){var d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return iso(d)}
+function diff(a,b){return Math.round((new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/864e5)}
+function fdate(s){if(!s)return '—';var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function num(n,d){return new Intl.NumberFormat('fr-FR',{maximumFractionDigits:d==null?0:d}).format(n||0).replace(/[  ]/g,' ')}
+function money(n){return num(Math.round(n||0))+' FCFA'}
+function kgs(g){return num(g/1000,2)+' kg'}
+function gr(g){return num(g)+' g'}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function sum(a,k){var t=0;for(var i=0;i<a.length;i++)t+=Number(k?a[i][k]:a[i])||0;return t}
+function by(a,k){return a.slice().sort(function(x,y){return x[k]<y[k]?-1:x[k]>y[k]?1:0})}
+function pct(n,d){return d>0?Math.round(n/d*1000)/10:null}
+function fpct(v){return v==null?'—':num(v,1)+' %'}
+
+/* ---------- données ---------- */
+var S;
+function defaults(){return{v:1,demo:false,lastBackup:null,
+  settings:{ferme:'Nouvelle Ferme',cibleCarcasse:1,rendement:55,gestation:31,palpation:12,sevrage:35,intervallePesee:7,prixAliment:350,repartition:'effectif',
+    prix:{vif:5000,abattu:6000,reproducteur:15000,sevre:2500},
+    tranches:[{min:0,max:1,prix:4500},{min:1,max:1.2,prix:5500},{min:1.2,max:1.5,prix:6500},{min:1.5,max:99,prix:8000}]},
+  animals:[],lots:[],weighings:[],events:[],feeds:[],breedings:[],abattages:[],sales:[],expenses:[],incomes:[],log:[],stock:[],mvts:[],health:[]}}
+function seedPhase2(s){
+  var t=today(),d=function(n){return addDays(t,-n)};
+  s.stock=[{id:'s1',nom:'Granulés lapin croissance',unite:'kg',seuil:100}];
+  s.mvts=[{id:uid('m'),itemId:'s1',date:d(30),type:'achat',qte:250,prix:350,fournisseur:'Fournisseur local'},{id:uid('m'),itemId:'s1',date:d(6),type:'achat',qte:200,prix:350,fournisseur:'Fournisseur local'}];
+  s.feeds.forEach(function(f){f.itemId='s1'});
+  s.health=[
+    {id:'h1',date:d(20),lotId:'l1',animalId:'',type:'traitement',symptomes:'Diarrhée chez plusieurs lapereaux',diagnostic:'À confirmer',diagnosticPar:'Vétérinaire (exemple)',produit:'Produit vétérinaire (exemple)',dosage:'Selon l’ordonnance',duree:5,delai:7,responsable:'Agent d’élevage',suivi:d(13),done:true,resultat:'Amélioration après 3 jours'},
+    {id:'h2',date:d(2),lotId:'l2',animalId:'',type:'vaccination',symptomes:'',diagnostic:'',diagnosticPar:'',produit:'Vaccin (exemple)',dosage:'Selon la notice',duree:0,delai:0,responsable:'Agent d’élevage',suivi:addDays(t,2),done:false,resultat:''},
+    {id:'h3',date:d(3),lotId:'l2',animalId:'',type:'traitement',symptomes:'Éternuements',diagnostic:'À confirmer',diagnosticPar:'Vétérinaire (exemple)',produit:'Produit vétérinaire (exemple)',dosage:'Selon l’ordonnance',duree:3,delai:10,responsable:'Agent d’élevage',suivi:'',done:false,resultat:''}];
+  s.p2=true}
+function seed(){
+  var t=today(),d=function(n){return addDays(t,-n)},s=defaults();s.demo=true;
+  s.animals=[
+    {id:'a1',num:'M-001',nom:'Tarzan',sexe:'M',race:'Néo-zélandais',couleur:'Blanc',naissance:d(300),origine:'Né à la ferme',entree:d(300),cage:'R-01',pere:'',mere:'',statut:'reproducteur',poids:3900,notes:''},
+    {id:'a2',num:'F-001',nom:'Awa',sexe:'F',race:'Néo-zélandais',couleur:'Blanc',naissance:d(330),origine:'Acheté',entree:d(260),cage:'R-02',pere:'',mere:'',statut:'reproducteur',poids:4100,notes:''},
+    {id:'a3',num:'F-002',nom:'Mariam',sexe:'F',race:'Californien',couleur:'Blanc, oreilles noires',naissance:d(310),origine:'Acheté',entree:d(260),cage:'R-03',pere:'',mere:'',statut:'reproducteur',poids:3800,notes:''},
+    {id:'a4',num:'F-003',nom:'Fanta',sexe:'F',race:'Néo-zélandais',couleur:'Blanc',naissance:d(240),origine:'Né à la ferme',entree:d(240),cage:'R-04',pere:'a1',mere:'a2',statut:'reproducteur',poids:3700,notes:''}];
+  s.lots=[
+    {id:'l0',num:'L-000',constitution:d(80),origine:'Portée F-001',initial:20,naissance:d(115),poidsInit:800,categorie:'Engraissement',cage:'Bât. 1',notes:''},
+    {id:'l1',num:'L-001',constitution:d(28),origine:'Portées F-001 et F-002',initial:22,naissance:d(63),poidsInit:800,categorie:'Engraissement',cage:'Bât. 1',notes:''},
+    {id:'l2',num:'L-002',constitution:d(10),origine:'Portée F-003',initial:18,naissance:d(45),poidsInit:800,categorie:'Engraissement',cage:'Bât. 2',notes:''}];
+  var w=function(l,n,g,m){s.weighings.push({id:uid('w'),lotId:l,date:d(n),n:m||10,g:g})};
+  w('l1',21,1050);w('l1',14,1330);w('l1',7,1600);w('l1',1,1750);w('l2',3,1030);w('l0',60,1250);w('l0',40,1650);w('l0',20,1840);
+  var e=function(l,n,k,c){s.events.push({id:uid('e'),type:'mort',lotId:l,date:d(n),n:k,cause:c})};
+  e('l1',20,1,'Diarrhée');e('l1',9,1,'Indéterminée');e('l2',5,1,'Indéterminée');e('l0',50,1,'Coup de chaleur');
+  var f=function(l,n,k){s.feeds.push({id:uid('f'),lotId:l,date:d(n),kg:k})};
+  f('l1',21,12);f('l1',14,16);f('l1',7,20);f('l1',1,22);f('l2',6,5);f('l2',2,8);
+  s.breedings=[
+    {id:'b0',femelle:'a2',male:'a1',saillie:d(110),palpation:'positif',miseBas:d(79),nes:9,mortNes:0,sevrageDate:d(44),sevres:8,gardes:1,mortAvant:1,notes:''},
+    {id:'b00',femelle:'a3',male:'a1',saillie:d(100),palpation:'positif',miseBas:d(69),nes:7,mortNes:1,sevrageDate:d(34),sevres:5,gardes:0,mortAvant:1,notes:''},
+    {id:'b1',femelle:'a2',male:'a1',saillie:d(40),palpation:'positif',miseBas:d(9),nes:8,mortNes:1,sevrageDate:'',sevres:0,gardes:0,mortAvant:0,notes:''},
+    {id:'b2',femelle:'a3',male:'a1',saillie:d(14),palpation:'attente',miseBas:'',nes:0,mortNes:0,sevrageDate:'',sevres:0,gardes:0,mortAvant:0,notes:''},
+    {id:'b3',femelle:'a4',male:'a1',saillie:d(31),palpation:'positif',miseBas:'',nes:0,mortNes:0,sevrageDate:'',sevres:0,gardes:0,mortAvant:0,notes:''}];
+  s.abattages=[{id:'ab1',lotId:'l0',date:d(12),n:14,vif:25.9,carcasse:14.2,pertes:0,notes:''}];
+  s.sales=[
+    {id:'v1',num:'V-0001',date:d(15),client:'Restaurant Le Baobab',tel:'',cat:'vif',lotId:'l0',animalId:'',qte:5,poids:0,prixUnit:5000,remise:0,encaisse:25000,mode:'Espèces',resp:'Patron',force:false},
+    {id:'v2',num:'V-0002',date:d(11),client:'Mme Koné',tel:'',cat:'carcasse',lotId:'l0',animalId:'',qte:5,poids:1.0,prixUnit:5500,remise:0,encaisse:20000,mode:'Mobile money',resp:'Patron',force:false}];
+  var x=function(n,c,m,l){s.expenses.push({id:uid('x'),date:d(n),cat:c,montant:m,note:'',lotId:l||''})};
+  x(100,'Achat de reproducteurs',45000);x(20,'Aliments',87500);x(6,'Aliments',70000);x(8,'Produits vétérinaires',8500,'l1');
+  x(5,'Main-d’œuvre',30000);x(4,'Eau et électricité',12000);x(3,'Transport',5000);
+  seedPhase2(s);
+  return s}
+function load(){try{var r=localStorage.getItem(KEY);if(r){var o=JSON.parse(r);if(o&&o.v===1)return o}}catch(e){storageOk=false}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false}}
+function logOp(t){S.log.unshift({d:new Date().toISOString(),t:t});if(S.log.length>200)S.log.length=200}
+S=load()||seed();
+(function(){var d=defaults();['stock','mvts','health','incomes','log'].forEach(function(k){if(!S[k])S[k]=d[k]});
+  if(S.demo&&!S.p2&&!S.stock.length&&!S.mvts.length&&!S.health.length)seedPhase2(S);S.p2=true})();
+
+/* ---------- calculs ---------- */
+var CATS_DEP=['Aliments','Achat de reproducteurs','Produits vétérinaires','Main-d’œuvre','Eau et électricité','Transport','Entretien des installations','Autres charges'];
+var CAT_LABEL={vif:'Lapin vivant',abattu:'Lapin abattu',carcasse:'Carcasse (par poids)',reproducteur:'Reproducteur',sevre:'Lapereau sevré'};
+function cfg(){return S.settings}
+function targetLive(){return cfg().cibleCarcasse*1000/(cfg().rendement/100)}
+function find(a,id){for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];return null}
+function lotLabel(id){var l=find(S.lots,id);return l?l.num:'—'}
+function animalLabel(id){var a=find(S.animals,id);return a?(a.num+(a.nom?' · '+a.nom:'')):'—'}
+function lotStats(l){
+  var ev=S.events.filter(function(e){return e.lotId===l.id});
+  var morts=sum(ev.filter(function(e){return e.type==='mort'}),'n');
+  var out=sum(ev.filter(function(e){return e.type==='sortie'}),'n');
+  var inn=sum(ev.filter(function(e){return e.type==='entree'}),'n');
+  var abs=S.abattages.filter(function(a){return a.lotId===l.id});
+  var ab=sum(abs,'n'),pertes=sum(abs,'pertes');
+  var sv=S.sales.filter(function(s){return s.lotId===l.id});
+  var sold=sum(sv.filter(function(s){return s.cat==='vif'||s.cat==='sevre'}),'qte');
+  var soldC=sum(sv.filter(function(s){return s.cat==='carcasse'||s.cat==='abattu'}),'qte');
+  var present=l.initial+inn-out-morts-ab-sold;
+  var pts=[{date:l.constitution,g:l.poidsInit}].concat(by(S.weighings.filter(function(w){return w.lotId===l.id}),'date').map(function(w){return{date:w.date,g:w.g,n:w.n}}));
+  var last=pts[pts.length-1],ref=pts[Math.max(0,pts.length-3)],dd=diff(last.date,ref.date);
+  var gmq=dd>0?(last.g-ref.g)/dd:0,tg=targetLive(),est=null;
+  if(gmq>0&&last.g<tg)est=addDays(last.date,Math.ceil((tg-last.g)/gmq));
+  var fed=sum(S.feeds.filter(function(f){return f.lotId===l.id}),'kg');
+  return{present:present,morts:morts,inn:inn,out:out,ab:ab,pertes:pertes,sold:sold,carcStock:ab-pertes-soldC,pts:pts,last:last,gmq:gmq,est:est,
+    ready:present>0&&last.g>=tg,mort:pct(morts,l.initial+inn),fed:fed,
+    age:l.naissance?diff(today(),l.naissance):null,sinceWeigh:diff(today(),last.date)}}
+function salesNet(s){return (Number(s.qte)||0)*(Number(s.prixUnit)||0)-(Number(s.remise)||0)}
+function periodStart(){var p=UI.period,t=today();if(p==='mois')return t.slice(0,8)+'01';if(p==='30j')return addDays(t,-29);return ''}
+function inP(d){var st=periodStart();return !st||(d>=st&&d<=today())}
+function itemQty(it){var q=0;S.mvts.forEach(function(m){if(m.itemId===it.id)q+=m.type==='perte'?-m.qte:m.qte});S.feeds.forEach(function(f){if(f.itemId===it.id)q-=f.kg});return q}
+function itemAvg(it){var q=0,v=0;S.mvts.forEach(function(m){if(m.itemId===it.id&&m.type==='achat'&&m.prix>0){q+=m.qte;v+=m.qte*m.prix}});return q>0?v/q:cfg().prixAliment}
+function feedCost(f){var it=f.itemId&&find(S.stock,f.itemId);return f.kg*(it?itemAvg(it):cfg().prixAliment)}
+function attenteFin(h){return h.delai>0?addDays(h.date,(h.duree||0)+h.delai):null}
+function attenteLot(lotId){var t=today(),best=null;S.health.forEach(function(h){if(h.lotId===lotId&&h.type==='traitement'){var f=attenteFin(h);if(f&&f>=t&&(!best||f>best))best=f}});return best}
+function lotBilan(l){
+  var st=lotStats(l),ca=sum(S.sales.filter(function(s){return s.lotId===l.id}).map(function(s){return{v:salesNet(s)}}),'v');
+  var coutAlim=sum(S.feeds.filter(function(f){return f.lotId===l.id}).map(function(f){return{v:feedCost(f)}}),'v');
+  var direct=sum(S.expenses.filter(function(x){return x.lotId===l.id}),'montant');
+  var communs=sum(S.expenses.filter(function(x){return !x.lotId&&x.cat!=='Aliments'&&x.cat!=='Achat de reproducteurs'}),'montant');
+  var tot=sum(S.lots,'initial'),alloc=cfg().repartition==='effectif'&&tot>0?communs*l.initial/tot:0;
+  var cout=coutAlim+direct+alloc;
+  var vendus=sum(S.sales.filter(function(s){return s.lotId===l.id}),'qte');
+  var kgC=sum(S.abattages.filter(function(a){return a.lotId===l.id}),'carcasse');
+  return{ca:ca,coutAlim:coutAlim,alimParLapin:vendus>0?coutAlim/vendus:null,alimParKg:kgC>0?coutAlim/kgC:null,direct:direct,alloc:alloc,cout:cout,marge:ca-cout,vendus:vendus,kgC:kgC,
+    parLapin:vendus>0?cout/vendus:null,parKg:kgC>0?cout/kgC:null}}
+function breedStatus(b){
+  var t=today();
+  if(b.sevrageDate)return{k:'sevre',l:'Sevrée',c:'good'};
+  if(b.miseBas)return{k:'allaitante',l:'Mise bas '+fdate(b.miseBas),c:'good'};
+  if(b.palpation==='negatif')return{k:'vide',l:'Non gestante',c:''};
+  var prev=addDays(b.saillie,cfg().gestation);
+  if(prev<t)return{k:'retard',l:'Mise bas en retard',c:'bad'};
+  return{k:'gestante',l:b.palpation==='positif'?'Gestante':'À palper',c:b.palpation==='positif'?'warn':''}}
+function alerts(){
+  var a=[],t=today(),c=cfg();
+  S.breedings.forEach(function(b){
+    var f=animalLabel(b.femelle);
+    if(!b.miseBas&&b.palpation==='attente'){var dp=addDays(b.saillie,c.palpation);if(dp<=t)a.push({c:'warn',t:'Palpation à faire : '+f,s:'Saillie du '+fdate(b.saillie)+' (prévue le '+fdate(dp)+')'})}
+    if(!b.miseBas&&b.palpation!=='negatif'){var mb=addDays(b.saillie,c.gestation),r=diff(mb,t);
+      if(r<0)a.push({c:'bad',t:'Mise bas en retard : '+f,s:'Prévue le '+fdate(mb)+' ('+(-r)+' j de retard). Contacter le vétérinaire si besoin.'});
+      else if(r<=5)a.push({c:'warn',t:'Mise bas '+(r===0?'attendue aujourd’hui':'dans '+r+' j')+' : '+f,s:'Prévue le '+fdate(mb)+'. Préparer la boîte à nid.'})}
+    if(b.miseBas&&!b.sevrageDate){var sv=addDays(b.miseBas,c.sevrage),r2=diff(sv,t);
+      if(r2<=3)a.push({c:'info',t:'Sevrage '+(r2<0?'dépassé':r2===0?'aujourd’hui':'dans '+r2+' j')+' : '+f,s:'Prévu le '+fdate(sv)})}});
+  S.lots.forEach(function(l){var st=lotStats(l);if(st.present<=0)return;
+    if(st.ready)a.push({c:'good',t:'Lot '+l.num+' prêt à la vente',s:'Poids moyen '+gr(st.last.g)+' pour un objectif de '+gr(targetLive())+' (vif)'});
+    if(st.sinceWeigh>=c.intervallePesee)a.push({c:'info',t:'Pesée à faire : lot '+l.num,s:'Dernière pesée il y a '+st.sinceWeigh+' j'});
+    if(st.mort!=null&&st.mort>=10)a.push({c:'bad',t:'Mortalité élevée : lot '+l.num,s:fpct(st.mort)+' de l’effectif initial'})});
+  S.stock.forEach(function(it){var q=itemQty(it);if(it.seuil>0&&q<=it.seuil)a.push({c:q<=0?'bad':'warn',t:'Stock bas : '+it.nom,s:num(q,1)+' '+it.unite+' restants (seuil '+num(it.seuil)+' '+it.unite+')'})});
+  S.health.forEach(function(h){if(h.suivi&&!h.done){var r=diff(h.suivi,t);if(r<=2)a.push({c:r<0?'warn':'info',t:'Suivi sanitaire '+(r<0?'en retard':r===0?'aujourd’hui':'dans '+r+' j')+' : '+(h.lotId?'lot '+lotLabel(h.lotId):animalLabel(h.animalId)),s:(h.produit||h.type)+' · prévu le '+fdate(h.suivi)})}});
+  S.lots.forEach(function(l){var f=attenteLot(l.id);if(f&&lotStats(l).present>0)a.push({c:'warn',t:'Délai d’attente : lot '+l.num,s:'Ne pas commercialiser avant le '+fdate(addDays(f,1))+'. À confirmer avec la notice ou le vétérinaire.'})});
+  var du=sum(S.sales.map(function(s){return{v:salesNet(s)-(Number(s.encaisse)||0)}}),'v');
+  if(du>0)a.push({c:'warn',t:'Créances clients : '+money(du),s:S.sales.filter(function(s){return salesNet(s)>s.encaisse}).length+' vente(s) non soldée(s)'});
+  var lb=S.lastBackup?diff(t,S.lastBackup.slice(0,10)):null;
+  if(!storageOk)a.unshift({c:'bad',t:'Stockage indisponible',s:'Les données ne sont pas conservées. Exporter une sauvegarde maintenant.'});
+  else if(lb==null||lb>=7)a.push({c:'info',t:'Sauvegarde conseillée',s:lb==null?'Aucune sauvegarde faite pour l’instant.':'Dernière sauvegarde il y a '+lb+' j.'});
+  return a}
+
+/* ---------- interface : base ---------- */
+var UI={tab:'home',seg:{cheptel:'lots',argent:'ventes',repro:'femelles'},period:'mois',lot:'',sel:null};
+var ACT={},FORM=null,YES=null;
+function $(s){return document.querySelector(s)}
+function openSheet(h){$('#pane').innerHTML=h;$('#sheet').classList.add('open');$('#pane').scrollTop=0}
+function closeSheet(){$('#sheet').classList.remove('open');$('#pane').innerHTML='';FORM=null}
+function toast(m){var t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},2400)}
+function commit(msg){save();render();if(msg)toast(msg)}
+function confirmSheet(msg,onYes,label){YES=onYes;openSheet('<h2>Confirmer</h2><p>'+msg+'</p><div class="btns"><button class="btn dng" data-act="yes">'+(label||'Confirmer')+'</button><button class="btn" data-act="close">Annuler</button></div>')}
+function opts(arr,blank){var o=blank!=null?[['',blank]]:[];return o.concat(arr)}
+function lotOpts(onlyActive){return S.lots.filter(function(l){return !onlyActive||lotStats(l).present>0}).map(function(l){return[l.id,l.num+' · '+lotStats(l).present+' présents']})}
+function animalOpts(sexe){return S.animals.filter(function(a){return(!sexe||a.sexe===sexe)&&['mort','vendu','reforme'].indexOf(a.statut)<0}).map(function(a){return[a.id,animalLabel(a.id)]})}
+
+function fieldHtml(f,v){
+  var val=v[f.k];if(val==null)val=f.def!=null?f.def:'';
+  var id='f_'+f.k,h='';
+  if(f.t==='chk')return '<div class="fw" id="w_'+f.k+'"><label class="chk"><input type="checkbox" id="'+id+'"'+(val?' checked':'')+'>'+esc(f.l)+'</label></div>';
+  h+='<div class="fw" id="w_'+f.k+'"><label class="f" for="'+id+'">'+esc(f.l)+(f.hint?' <span class="hint">'+esc(f.hint)+'</span>':'');
+  if(f.t==='select'){h+='<select id="'+id+'">'+f.opts.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(o[0])===String(val)?' selected':'')+'>'+esc(o[1])+'</option>'}).join('')+'</select>'}
+  else if(f.t==='area'){h+='<textarea id="'+id+'">'+esc(val)+'</textarea>'}
+  else if(f.t==='number'){h+='<input id="'+id+'" type="number" step="'+(f.step||'any')+'" inputmode="decimal" min="'+(f.min!=null?f.min:0)+'" value="'+esc(val)+'">'}
+  else{h+='<input id="'+id+'" type="'+(f.t||'text')+'" value="'+esc(val)+'"'+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+'>'}
+  return h+'</label></div>'}
+function collect(){
+  var o={},err='';
+  FORM.fields.forEach(function(f){var el=document.getElementById('f_'+f.k);if(!el)return;
+    var hidden=el.closest('.fw').hidden,v;
+    if(f.t==='chk')v=el.checked;else if(f.t==='number')v=el.value===''?null:Number(el.value);else v=el.value.trim();
+    o[f.k]=v;
+    if(!hidden&&f.req&&(v===''||v==null)&&!err)err='Renseigner : '+f.l;
+    if(!hidden&&f.t==='number'&&v!=null&&isNaN(v)&&!err)err='Nombre invalide : '+f.l});
+  return{v:o,err:err}}
+function form(title,fields,vals,onSave,opt){
+  opt=opt||{};vals=vals||{};
+  var h='<h2>'+esc(title)+'</h2>'+(opt.intro?'<p class="small" style="margin:4px 0 0">'+opt.intro+'</p>':'')+'<form id="theForm" novalidate>',i=0;
+  while(i<fields.length){var f=fields[i];
+    if(f.half&&fields[i+1]&&fields[i+1].half){h+='<div class="two">'+fieldHtml(f,vals)+fieldHtml(fields[i+1],vals)+'</div>';i+=2}
+    else{h+=fieldHtml(f,vals);i++}}
+  h+='<div id="liveInfo" class="small" style="margin-top:10px"></div><div id="formErr" class="small" role="alert" style="color:var(--bad);margin-top:8px"></div>';
+  h+='<div class="btns"><button class="btn pri" type="submit">'+(opt.ok||'Enregistrer')+'</button><button class="btn" type="button" data-act="close">Annuler</button>'+(opt.extra||'')+(opt.del?'<button class="btn dng" type="button" data-act="formdel">Supprimer</button>':'')+'</div></form>';
+  openSheet(h);FORM={fields:fields,onSave:onSave,del:opt.del,live:opt.live};
+  if(opt.live)runLive()}
+function setF(k,v){var el=document.getElementById('f_'+k);if(el)el.value=v==null?'':v}
+function showF(k,on){var w=document.getElementById('w_'+k);if(w)w.hidden=!on}
+function runLive(){if(!FORM||!FORM.live)return;var c=collect(),r=FORM.live(c.v,setF,showF);var li=document.getElementById('liveInfo');if(li)li.innerHTML=r||''}
+document.addEventListener('input',function(e){if(FORM&&e.target.closest&&e.target.closest('#theForm'))runLive()});
+document.addEventListener('change',function(e){if(FORM&&e.target.closest&&e.target.closest('#theForm'))runLive()});
+document.addEventListener('submit',function(e){
+  if(e.target.id!=='theForm')return;e.preventDefault();
+  var c=collect(),er=document.getElementById('formErr');
+  if(c.err){er.textContent=c.err;return}
+  var r=FORM.onSave(c.v);
+  if(typeof r==='string'){er.textContent=r;return}
+  closeSheet()});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  var a=t.dataset.act;
+  if(a==='close')return closeSheet();
+  if(a==='yes'){var y=YES;YES=null;closeSheet();if(y)y();return}
+  if(a==='formdel'){var d=FORM&&FORM.del;if(d)d();return}
+  if(ACT[a])ACT[a](t.dataset,t)});
+$('#sheetBack').addEventListener('click',closeSheet);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet()});
+
+/* ---------- onglets ---------- */
+var ICONS={
+  home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  cheptel:'<rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/>',
+  croiss:'<path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/>',
+  repro:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.600-7 10-7 10z"/>',
+  argent:'<circle cx="12" cy="12" r="9"/><path d="M14.500 9.500c-.5-1-1.500-1.500-2.500-1.500-1.500 0-2.500.8-2.500 2s1 1.700 2.500 2 2.500.8 2.500 2-1 2-2.500 2c-1.100 0-2.100-.5-2.600-1.500"/><path d="M12 6.500V8M12 16v1.500"/>'};
+var TABS=[['home','Accueil'],['cheptel','Cheptel'],['croiss','Croissance'],['repro','Repro'],['argent','Argent']];
+function renderTabs(){$('#tabs').innerHTML=TABS.map(function(t){return '<button data-act="tab" data-t="'+t[0]+'"'+(UI.tab===t[0]?' aria-current="true"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[t[0]]+'</svg>'+t[1]+'</button>'}).join('')}
+ACT.tab=function(d){UI.tab=d.t;UI.sel=null;render();window.scrollTo(0,0)};
+ACT.seg=function(d){UI.seg[d.g]=d.v;render()};
+function seg(g,items){return '<div class="seg" role="group">'+items.map(function(i){return '<button data-act="seg" data-g="'+g+'" data-v="'+i[0]+'" aria-pressed="'+(UI.seg[g]===i[0])+'">'+i[1]+'</button>'}).join('')+'</div>'}
+function empty(t){return '<div class="empty">'+t+'</div>'}
+function kv(a,b){return '<div class="kv"><span>'+a+'</span><span>'+b+'</span></div>'}
+function kpi(v,l,cls){return '<div class="kpi '+(cls||'')+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'}
+function pill(t,c){return '<span class="pill '+(c||'')+'">'+esc(t)+'</span>'}
+function filterRow(){
+  return '<div class="filters"><select id="selPeriod" aria-label="Période" data-chg="period"><option value="mois"'+(UI.period==='mois'?' selected':'')+'>Ce mois</option><option value="30j"'+(UI.period==='30j'?' selected':'')+'>30 derniers jours</option><option value="tout"'+(UI.period==='tout'?' selected':'')+'>Tout</option></select>'+
+  '<select id="selLot" aria-label="Lot" data-chg="lot"><option value="">Tous les lots</option>'+S.lots.map(function(l){return '<option value="'+l.id+'"'+(UI.lot===l.id?' selected':'')+'>'+l.num+'</option>'}).join('')+'</select></div>'}
+document.addEventListener('change',function(e){var c=e.target.dataset&&e.target.dataset.chg;if(c){UI[c]=e.target.value;render()}});
+
+/* ---------- accueil ---------- */
+function vHome(){
+  var lots=S.lots.filter(function(l){return !UI.lot||l.id===UI.lot}),st=lots.map(function(l){return{l:l,s:lotStats(l)}});
+  var animals=UI.lot?[]:S.animals.filter(function(a){return['mort','vendu','reforme'].indexOf(a.statut)<0});
+  var lotPresent=sum(st.map(function(x){return{v:Math.max(0,x.s.present)}}),'v'),total=lotPresent+animals.length;
+  var repro=animals.filter(function(a){return a.statut==='reproducteur'});
+  var gest=S.breedings.filter(function(b){return !b.miseBas&&b.palpation!=='negatif'});
+  var nextMB=by(gest.map(function(b){return{d:addDays(b.saillie,cfg().gestation)}}),'d')[0];
+  var enCours=st.filter(function(x){return x.s.present>0});
+  var prets=sum(enCours.filter(function(x){return x.s.ready}).map(function(x){return{v:x.s.present}}),'v');
+  var morts=sum(S.events.filter(function(e){return e.type==='mort'&&inP(e.date)&&(!UI.lot||e.lotId===UI.lot)}),'n');
+  var sv=S.sales.filter(function(s){return !UI.lot||s.lotId===UI.lot});
+  var jour=sum(sv.filter(function(s){return s.date===today()}).map(function(s){return{v:salesNet(s)}}),'v');
+  var perS=sv.filter(function(s){return inP(s.date)}),ca=sum(perS.map(function(s){return{v:salesNet(s)}}),'v');
+  var dep=sum(S.expenses.filter(function(x){return inP(x.date)&&(!UI.lot||x.lotId===UI.lot)}),'montant');
+  var h='';
+  if(S.demo)h+='<div class="banner"><b>Données d’exemple.</b> Elles montrent comment l’application se remplit. Effacez-les avant de saisir vos vrais animaux.<div class="btns" style="margin-top:8px"><button class="btn sm pri" data-act="clearDemo">Effacer les exemples</button></div></div>';
+  h+=filterRow();
+  h+='<section class="blk"><div class="grid">'+kpi(num(total),'lapins présents'+(UI.lot?' dans le lot':' (reproducteurs + lots)'),'hero')+
+    kpi(repro.length,'reproducteurs actifs')+kpi(gest.length,'femelles gestantes'+(nextMB?' · mise bas '+fdate(nextMB.d):''))+
+    kpi(num(lotPresent),'lapereaux en croissance ('+enCours.length+' lot'+(enCours.length>1?'s':'')+')')+kpi(prets,'prêts à la vente')+
+    kpi(morts,'mortalités ('+(UI.period==='mois'?'ce mois':UI.period==='30j'?'30 jours':'total')+')')+kpi(money(jour),'ventes du jour')+'</div></section>';
+  var al=alerts();
+  h+='<section class="blk"><div class="h2row"><h2>À faire</h2><span class="small">Rappels indicatifs. Le jugement de l’éleveur ou du vétérinaire prime.</span></div><div class="list">'+(al.length?al.map(function(x){return '<div class="alert '+x.c+'"><div><b>'+esc(x.t)+'</b><div class="small">'+esc(x.s)+'</div></div></div>'}).join(''):empty('Rien à signaler pour l’instant.'))+'</div></section>';
+  h+='<section class="blk"><div class="h2row"><h2>Résultats</h2></div><div class="grid">'+kpi(money(ca),'chiffre d’affaires')+kpi(money(dep),'dépenses')+kpi(money(ca-dep),'résultat estimé',ca-dep<0?'':'')+kpi(money(sum(S.sales.map(function(s){return{v:salesNet(s)-(Number(s.encaisse)||0)}}),'v')),'créances clients')+
+    kpi(num(sum(S.stock.map(function(it){return{v:itemQty(it)}}),'v'),0)+' kg','stock d’aliments')+kpi(num(sum(S.feeds.filter(function(f){return inP(f.date)&&(!UI.lot||f.lotId===UI.lot)}),'kg'),0)+' kg','aliment distribué')+'</div></section>';
+  h+='<section class="blk"><div class="h2row"><h2>Lots en cours</h2></div><div class="list">'+(enCours.length?enCours.map(function(x){var p=Math.min(100,x.s.last.g/targetLive()*100);
+    return '<button class="row" data-act="openLot" data-id="'+x.l.id+'"><div class="main"><div class="t">'+x.l.num+' · '+x.s.present+' lapins</div><div class="s">Poids moyen '+gr(x.s.last.g)+' sur '+gr(targetLive())+' visés</div><div class="bar"><i style="width:'+p+'%"></i></div></div><div class="end">'+(x.s.ready?pill('Prêt','good'):x.s.est?'<span class="small">vers le '+fdate(x.s.est)+'</span>':'')+'</div></button>'}).join(''):empty('Aucun lot en cours. Créez un lot dans Cheptel.'))+'</div></section>';
+  return h}
+ACT.clearDemo=function(){confirmSheet('Supprimer tous les animaux, lots, ventes et dépenses d’exemple ? Les paramètres sont conservés.',function(){var s=S.settings;S=defaults();S.settings=s;logOp('Données d’exemple effacées');commit('Exemples effacés')},'Effacer')};
+
+/* ---------- cheptel ---------- */
+var STATUTS=[['actif','Actif'],['reproducteur','Reproducteur'],['engraissement','Engraissement'],['vendu','Vendu'],['mort','Mort'],['reforme','Réformé']];
+function statLabel(s){for(var i=0;i<STATUTS.length;i++)if(STATUTS[i][0]===s)return STATUTS[i][1];return s}
+function vCheptel(){
+  var h=seg('cheptel',[['lots','Lots'],['animaux','Animaux'],['sante','Santé']]);
+  if(UI.seg.cheptel==='sante')return h+vSante();
+  if(UI.seg.cheptel==='lots'){
+    h+='<section class="blk"><div class="list">'+(S.lots.length?by(S.lots,'constitution').reverse().map(function(l){var s=lotStats(l);
+      return '<button class="row" data-act="openLot" data-id="'+l.id+'"><div class="main"><div class="t">'+esc(l.num)+' · '+s.present+' présent'+(s.present>1?'s':'')+'</div><div class="s">'+esc(l.categorie)+' · '+esc(l.cage||'sans emplacement')+' · constitué le '+fdate(l.constitution)+'</div></div><div class="end">'+(s.present<=0?pill('Terminé'):s.ready?pill('Prêt','good'):gr(s.last.g))+'</div></button>'}).join(''):empty('Aucun lot. Un lot regroupe des lapereaux élevés ensemble.'))+'</div></section><button class="fab" data-act="newLot">+ Lot</button>';
+  }else{
+    h+='<section class="blk"><div class="list">'+(S.animals.length?by(S.animals,'num').map(function(a){
+      return '<button class="row" data-act="openAnimal" data-id="'+a.id+'"><div class="main"><div class="t">'+esc(a.num)+(a.nom?' · '+esc(a.nom):'')+'</div><div class="s">'+(a.sexe==='F'?'Femelle':'Mâle')+' · '+esc(a.race||'race non précisée')+' · cage '+esc(a.cage||'—')+'</div></div><div class="end">'+pill(statLabel(a.statut),a.statut==='reproducteur'?'good':(a.statut==='mort'?'bad':''))+'</div></button>'}).join(''):empty('Aucune fiche individuelle. Réservez-les aux reproducteurs et aux animaux à suivre de près.'))+'</div></section><button class="fab" data-act="newAnimal">+ Animal</button>'}
+  return h}
+function animalFields(){return[
+  {k:'num',l:'Numéro d’identification',req:1,half:1},{k:'nom',l:'Nom (facultatif)',half:1},
+  {k:'sexe',l:'Sexe',t:'select',opts:[['F','Femelle'],['M','Mâle']],half:1},{k:'statut',l:'Statut',t:'select',opts:STATUTS,half:1},
+  {k:'race',l:'Race ou souche',half:1},{k:'couleur',l:'Couleur',half:1},
+  {k:'naissance',l:'Date de naissance',t:'date',half:1},{k:'entree',l:'Date d’entrée',t:'date',half:1},
+  {k:'origine',l:'Origine',ph:'Né à la ferme, acheté chez…'},{k:'cage',l:'Cage ou emplacement'},
+  {k:'pere',l:'Père',t:'select',opts:opts(animalOpts('M'),'Inconnu')},{k:'mere',l:'Mère',t:'select',opts:opts(animalOpts('F'),'Inconnue')},
+  {k:'poids',l:'Poids actuel',hint:'en grammes',t:'number'},{k:'notes',l:'Notes',t:'area'}]}
+ACT.newAnimal=function(){
+  var n=S.animals.length+1;
+  form('Nouvelle fiche',animalFields(),{num:'A-'+('00'+n).slice(-3),sexe:'F',statut:'reproducteur',entree:today()},function(v){
+    if(S.animals.some(function(a){return a.num.toLowerCase()===v.num.toLowerCase()}))return 'Ce numéro existe déjà.';
+    v.id=uid('a');S.animals.push(v);if(v.poids)S.weighings.push({id:uid('w'),animalId:v.id,date:today(),g:v.poids});
+    logOp('Animal créé : '+v.num);commit('Fiche créée')})};
+ACT.openAnimal=function(d){
+  var a=find(S.animals,d.id);if(!a)return;
+  var ws=by(S.weighings.filter(function(w){return w.animalId===a.id}),'date').reverse().slice(0,6);
+  var brs=S.breedings.filter(function(b){return b.femelle===a.id||b.male===a.id});
+  var h='<h2>'+esc(a.num)+(a.nom?' · '+esc(a.nom):'')+'</h2><div class="small">'+pill(statLabel(a.statut))+'</div><div class="card" style="margin-top:10px">'+
+    kv('Sexe',a.sexe==='F'?'Femelle':'Mâle')+kv('Race',esc(a.race||'—'))+kv('Couleur',esc(a.couleur||'—'))+kv('Naissance',fdate(a.naissance))+kv('Entrée',fdate(a.entree))+kv('Origine',esc(a.origine||'—'))+kv('Cage',esc(a.cage||'—'))+
+    kv('Père',a.pere?esc(animalLabel(a.pere)):'—')+kv('Mère',a.mere?esc(animalLabel(a.mere)):'—')+kv('Poids actuel',a.poids?gr(a.poids):'—')+(brs.length?kv('Reproduction',brs.length+' saillie'+(brs.length>1?'s':'')+' · '+brs.filter(function(b){return b.miseBas}).length+' mise(s) bas'):'')+'</div>';
+  if(ws.length)h+='<h3 style="margin-top:14px;font-size:15px">Pesées</h3><div class="card">'+ws.map(function(w){return kv(fdate(w.date),gr(w.g))}).join('')+'</div>';
+  if(a.notes)h+='<p class="small">'+esc(a.notes)+'</p>';
+  h+='<div class="btns"><button class="btn pri" data-act="weighAnimal" data-id="'+a.id+'">Peser</button><button class="btn" data-act="newHealth" data-animal="'+a.id+'">Soin</button><button class="btn" data-act="editAnimal" data-id="'+a.id+'">Modifier</button>'+
+    (['mort','vendu','reforme'].indexOf(a.statut)<0?'<button class="btn dng" data-act="deadAnimal" data-id="'+a.id+'">Mort</button>':'')+'<button class="btn" data-act="close">Fermer</button></div>';
+  openSheet(h)};
+ACT.editAnimal=function(d){
+  var a=find(S.animals,d.id);
+  form('Modifier '+a.num,animalFields(),a,function(v){
+    if(S.animals.some(function(x){return x.id!==a.id&&x.num.toLowerCase()===v.num.toLowerCase()}))return 'Ce numéro existe déjà.';
+    Object.keys(v).forEach(function(k){a[k]=v[k]});logOp('Animal modifié : '+a.num);commit('Fiche mise à jour')},
+    {del:function(){confirmSheet('Supprimer définitivement la fiche '+esc(a.num)+' ? Cette opération est enregistrée dans le journal.',function(){
+      S.animals=S.animals.filter(function(x){return x.id!==a.id});logOp('Animal supprimé : '+a.num);commit('Fiche supprimée')},'Supprimer')}})};
+ACT.weighAnimal=function(d){
+  var a=find(S.animals,d.id);
+  form('Pesée de '+a.num,[{k:'date',l:'Date',t:'date',req:1,half:1},{k:'g',l:'Poids',hint:'en g',t:'number',req:1,half:1}],{date:today(),g:a.poids},function(v){
+    if(v.g<=0)return 'Le poids doit être positif.';
+    S.weighings.push({id:uid('w'),animalId:a.id,date:v.date,g:v.g});a.poids=v.g;commit('Pesée enregistrée')})};
+ACT.deadAnimal=function(d){
+  var a=find(S.animals,d.id);
+  form('Mortalité : '+a.num,[{k:'date',l:'Date',t:'date',req:1},{k:'cause',l:'Cause observée',ph:'Si connue'}],{date:today()},function(v){
+    a.statut='mort';S.events.push({id:uid('e'),type:'mort',animalId:a.id,date:v.date,n:1,cause:v.cause});
+    logOp('Mortalité animal : '+a.num);commit('Mortalité enregistrée')},{ok:'Enregistrer la mort'})};
+
+/* ---------- lots ---------- */
+function lotFields(){return[
+  {k:'num',l:'Numéro du lot',req:1,half:1},{k:'categorie',l:'Catégorie',t:'select',opts:[['Engraissement','Engraissement'],['Sevrage','Sevrage'],['Renouvellement','Renouvellement']],half:1},
+  {k:'constitution',l:'Date de constitution',t:'date',req:1,half:1},{k:'initial',l:'Nombre initial',t:'number',step:'1',req:1,half:1},
+  {k:'naissance',l:'Naissance estimée',t:'date',half:1},{k:'poidsInit',l:'Poids moyen initial',hint:'en g',t:'number',req:1,half:1},
+  {k:'origine',l:'Origine des lapereaux',ph:'Portée de F-001…'},{k:'cage',l:'Bâtiment ou cage'},{k:'notes',l:'Notes',t:'area'}]}
+ACT.newLot=function(){
+  var n=S.lots.length;
+  form('Nouveau lot',lotFields(),{num:'L-'+('00'+n).slice(-3),categorie:'Engraissement',constitution:today(),poidsInit:800},function(v){
+    if(S.lots.some(function(l){return l.num.toLowerCase()===v.num.toLowerCase()}))return 'Ce numéro de lot existe déjà.';
+    if(v.initial<1)return 'Le nombre initial doit être d’au moins 1.';
+    v.id=uid('l');S.lots.push(v);logOp('Lot créé : '+v.num);commit('Lot créé')})};
+ACT.editLot=function(d){
+  var l=find(S.lots,d.id);
+  form('Modifier '+l.num,lotFields(),l,function(v){
+    if(S.lots.some(function(x){return x.id!==l.id&&x.num.toLowerCase()===v.num.toLowerCase()}))return 'Ce numéro de lot existe déjà.';
+    Object.keys(v).forEach(function(k){l[k]=v[k]});logOp('Lot modifié : '+l.num);commit('Lot mis à jour')},
+    {del:function(){confirmSheet('Supprimer le lot '+esc(l.num)+' avec ses pesées, consommations et mortalités ? Les ventes déjà saisies sont conservées.',function(){
+      S.lots=S.lots.filter(function(x){return x.id!==l.id});['weighings','events','feeds','abattages'].forEach(function(k){S[k]=S[k].filter(function(x){return x.lotId!==l.id})});
+      logOp('Lot supprimé : '+l.num);commit('Lot supprimé')},'Supprimer')}})};
+ACT.openLot=function(d){
+  var l=find(S.lots,d.id);if(!l)return;var s=lotStats(l),b=lotBilan(l);
+  var ws=by(S.weighings.filter(function(w){return w.lotId===l.id}),'date').reverse().slice(0,5);
+  var ms=by(S.events.filter(function(e){return e.lotId===l.id&&e.type==='mort'}),'date').reverse().slice(0,5);
+  var h='<h2>Lot '+esc(l.num)+'</h2><div class="small">'+esc(l.categorie)+' · '+esc(l.cage||'sans emplacement')+' · '+esc(l.origine||'origine non précisée')+'</div>'+
+  '<div class="grid" style="margin-top:10px">'+kpi(s.present,'présents')+kpi(gr(s.last.g),'poids moyen (réel)')+'</div>'+
+  '<div class="card" style="margin-top:8px">'+kv('Effectif initial',l.initial+(s.inn?' + '+s.inn+' reçus':''))+kv('Mortalités',s.morts+(s.mort!=null?' ('+fpct(s.mort)+')':''))+(s.out?kv('Transférés',s.out):'')+kv('Abattus',s.ab)+kv('Vendus vivants',s.sold)+kv('Gain moyen quotidien',s.gmq?num(s.gmq,1)+' g/j':'—')+
+    kv('Objectif vif (estimé)',gr(targetLive())+' pour '+num(cfg().cibleCarcasse,2)+' kg de carcasse')+kv('Poids cible atteint (estimation)',s.ready?'Atteint':s.est?fdate(s.est):'—')+kv('Aliment distribué',num(s.fed,1)+' kg')+
+    (s.ab?kv('Carcasses en stock',s.carcStock):'')+kv('Âge',s.age!=null?s.age+' j':'—')+'</div>';
+  var at=attenteLot(l.id);
+  h+='<div class="card" style="margin-top:8px">'+(at?kv('Délai d’attente en cours','jusqu’au '+fdate(at)):'')+kv('Coût alimentaire',money(b.coutAlim)+(b.alimParLapin!=null?' · '+money(b.alimParLapin)+' par lapin vendu':''))+(b.alimParKg!=null?kv('Aliment par kg de carcasse',money(b.alimParKg)):'')+kv('Chiffre d’affaires du lot',money(b.ca))+kv('Coût estimé du lot',money(b.cout))+kv('Résultat estimé',money(b.marge))+'</div>';
+  if(ws.length)h+='<h3 style="margin-top:14px;font-size:15px">Dernières pesées</h3><div class="card">'+ws.map(function(w){return kv(fdate(w.date)+' · '+(w.n||'?')+' pesés',gr(w.g))}).join('')+'</div>';
+  if(ms.length)h+='<h3 style="margin-top:14px;font-size:15px">Mortalités</h3><div class="card">'+ms.map(function(e){return kv(fdate(e.date)+(e.cause?' · '+esc(e.cause):''),e.n)}).join('')+'</div>';
+  h+='<div class="btns"><button class="btn pri" data-act="weighLot" data-id="'+l.id+'">Pesée</button><button class="btn" data-act="feedLot" data-id="'+l.id+'">Aliment</button><button class="btn" data-act="deadLot" data-id="'+l.id+'">Mortalité</button><button class="btn" data-act="moveLot" data-id="'+l.id+'">Transfert</button><button class="btn" data-act="newHealth" data-lot="'+l.id+'">Soin</button><button class="btn" data-act="slaughter" data-id="'+l.id+'">Abattage</button><button class="btn" data-act="editLot" data-id="'+l.id+'">Modifier</button></div>';
+  openSheet(h)};
+ACT.weighLot=function(d){
+  form('Pesée',[{k:'lotId',l:'Lot',t:'select',opts:lotOpts(true),req:1},{k:'date',l:'Date',t:'date',req:1,half:1},{k:'n',l:'Animaux pesés',t:'number',step:'1',half:1},{k:'g',l:'Poids moyen',hint:'en grammes',t:'number',req:1}],{lotId:d.id,date:today()},function(v){
+    if(v.g<=0)return 'Le poids doit être positif.';
+    var l=find(S.lots,v.lotId);if(v.date<l.constitution)return 'La date précède la constitution du lot.';
+    S.weighings.push({id:uid('w'),lotId:v.lotId,date:v.date,n:v.n||0,g:v.g});commit('Pesée enregistrée')},
+    {intro:'Entrez le poids moyen de l’échantillon pesé. C’est une mesure réelle.'})};
+ACT.feedLot=function(d){
+  var items=S.stock.map(function(it){return[it.id,it.nom+' ('+num(itemQty(it),1)+' '+it.unite+' en stock)']});
+  form('Aliment distribué',[{k:'lotId',l:'Lot',t:'select',opts:lotOpts(true),req:1},{k:'itemId',l:'Aliment pris dans le stock',t:'select',opts:opts(items,'Hors stock (prix moyen des paramètres)')},{k:'date',l:'Date',t:'date',req:1,half:1},{k:'kg',l:'Quantité',hint:'en kg',t:'number',req:1,half:1}],{lotId:d.id,date:today(),itemId:(S.stock[0]||{}).id||''},function(v){
+    if(v.kg<=0)return 'La quantité doit être positive.';
+    var it=v.itemId&&find(S.stock,v.itemId);if(it&&v.kg>itemQty(it))return 'Stock insuffisant : '+num(itemQty(it),1)+' '+it.unite+' disponibles. Enregistrer d’abord un achat ou un inventaire.';
+    S.feeds.push({id:uid('f'),lotId:v.lotId,itemId:v.itemId,date:v.date,kg:v.kg});commit('Aliment enregistré')})};
+ACT.deadLot=function(d){
+  form('Mortalité',[{k:'lotId',l:'Lot',t:'select',opts:lotOpts(true),req:1},{k:'date',l:'Date',t:'date',req:1,half:1},{k:'n',l:'Nombre',t:'number',step:'1',req:1,half:1},{k:'cause',l:'Cause observée',ph:'Si connue'}],{lotId:d.id,date:today(),n:1},function(v){
+    var l=find(S.lots,v.lotId);if(v.n<1)return 'Indiquer au moins 1 animal.';
+    if(v.n>lotStats(l).present)return 'Il ne reste que '+lotStats(l).present+' animaux dans ce lot.';
+    S.events.push({id:uid('e'),type:'mort',lotId:v.lotId,date:v.date,n:v.n,cause:v.cause});logOp('Mortalité '+l.num+' : '+v.n);commit('Mortalité enregistrée')})};
+ACT.moveLot=function(d){
+  form('Transfert entre lots',[{k:'lotId',l:'Depuis le lot',t:'select',opts:lotOpts(true),req:1},{k:'to',l:'Vers le lot',t:'select',opts:opts(lotOpts(false),'Choisir'),req:1},{k:'date',l:'Date',t:'date',req:1,half:1},{k:'n',l:'Nombre',t:'number',step:'1',req:1,half:1}],{lotId:d.id,date:today()},function(v){
+    if(v.to===v.lotId)return 'Choisir deux lots différents.';
+    var l=find(S.lots,v.lotId);if(v.n<1||v.n>lotStats(l).present)return 'Nombre invalide : il reste '+lotStats(l).present+' dans le lot.';
+    S.events.push({id:uid('e'),type:'sortie',lotId:v.lotId,date:v.date,n:v.n},{id:uid('e'),type:'entree',lotId:v.to,date:v.date,n:v.n});
+    logOp('Transfert '+l.num+' → '+lotLabel(v.to)+' : '+v.n);commit('Transfert enregistré')})};
+
+/* ---------- croissance et abattage ---------- */
+function chartSvg(l,s){
+  var W=340,H=210,L=44,R=14,T=14,B=30,tg=targetLive(),pts=s.pts;
+  var d0=pts[0].date,dEnd=s.est&&!s.ready?s.est:pts[pts.length-1].date;
+  if(dEnd===d0)dEnd=addDays(d0,7);
+  var span=diff(dEnd,d0),yMax=Math.ceil(Math.max(tg*1.08,s.last.g*1.05)/500)*500,yMin=0;
+  var X=function(d){return L+(diff(d,d0)/span)*(W-L-R)},Y=function(g){return H-B-(g-yMin)/(yMax-yMin)*(H-T-B)};
+  var o='<svg class="chart" viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Courbe du poids moyen du lot '+esc(l.num)+' comparée à l’objectif">';
+  for(var g=0;g<=yMax;g+=500)o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(g)+'" y2="'+Y(g)+'" style="stroke:var(--line);stroke-width:1"/><text x="'+(L-6)+'" y="'+(Y(g)+4)+'" text-anchor="end">'+g+'</text>';
+  o+='<text x="'+L+'" y="'+(H-8)+'" text-anchor="start">'+fdate(d0).slice(0,5)+'</text><text x="'+(W-R)+'" y="'+(H-8)+'" text-anchor="end">'+fdate(dEnd).slice(0,5)+'</text>';
+  o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(tg)+'" y2="'+Y(tg)+'" style="stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4"/><text x="'+(L+4)+'" y="'+(Y(tg)-5)+'">Objectif vif '+Math.round(tg)+' g (estimé)</text>';
+  if(s.est&&!s.ready)o+='<line x1="'+X(s.last.date)+'" y1="'+Y(s.last.g)+'" x2="'+X(s.est)+'" y2="'+Y(tg)+'" style="stroke:var(--accent);stroke-width:2.5;stroke-dasharray:2 5;stroke-linecap:round"/><circle cx="'+X(s.est)+'" cy="'+Y(tg)+'" r="4" style="fill:var(--bg);stroke:var(--accent);stroke-width:2"/>';
+  o+='<polyline points="'+pts.map(function(p){return X(p.date).toFixed(1)+','+Y(p.g).toFixed(1)}).join(' ')+'" style="fill:none;stroke:var(--brand);stroke-width:2.5;stroke-linejoin:round"/>';
+  pts.forEach(function(p){o+='<circle cx="'+X(p.date).toFixed(1)+'" cy="'+Y(p.g).toFixed(1)+'" r="3.5" style="fill:var(--brand)"/>'});
+  var lp=pts[pts.length-1];o+='<text x="'+Math.min(X(lp.date),W-R-2)+'" y="'+(Y(lp.g)+16)+'" text-anchor="end" style="font-weight:700;fill:var(--ink)">'+Math.round(lp.g)+' g</text>';
+  return o+'</svg>'}
+function vCroiss(){
+  var act=S.lots.filter(function(l){return lotStats(l).present>0});
+  var sel=find(S.lots,UI.sel)||act[0]||S.lots[0];
+  var h='<section class="blk"><div class="card"><b>Objectif : '+num(cfg().cibleCarcasse,2)+' kg de carcasse par lapin</b><div class="small">Soit environ '+gr(targetLive())+' de poids vif avec un rendement attendu de '+num(cfg().rendement,1)+' %. Estimation modifiable dans les paramètres. Le poids vif et le poids de carcasse sont toujours enregistrés séparément.</div></div></section>';
+  if(sel){var s=lotStats(sel);
+    h+='<section class="blk"><div class="h2row"><h2>Courbe de croissance</h2></div><div class="filters" style="margin-top:0"><select id="selChart" data-chg="sel" aria-label="Lot affiché">'+S.lots.map(function(l){return '<option value="'+l.id+'"'+(l.id===sel.id?' selected':'')+'>'+l.num+' · '+lotStats(l).present+' présents</option>'}).join('')+'</select></div>'+
+    '<div class="card" style="margin-top:8px">'+chartSvg(sel,s)+'<div class="small">Trait plein : pesées réelles. Pointillé jaune : estimation à gain quotidien constant ('+(s.gmq?num(s.gmq,1)+' g/j':'indisponible')+').</div></div>'+
+    '<div class="btns"><button class="btn pri" data-act="weighLot" data-id="'+sel.id+'">Nouvelle pesée</button><button class="btn" data-act="openLot" data-id="'+sel.id+'">Fiche du lot</button></div></section>'}
+  h+='<section class="blk"><div class="h2row"><h2>Comparer les lots</h2></div>'+(S.lots.length?'<div class="card scroll-x"><table><thead><tr><th>Lot</th><th>Présents</th><th>Poids moy.</th><th>GMQ</th><th>Mortalité</th><th>Cible</th></tr></thead><tbody>'+
+    S.lots.map(function(l){var s=lotStats(l);return '<tr><td><b>'+esc(l.num)+'</b></td><td>'+s.present+'</td><td>'+gr(s.last.g)+'</td><td>'+(s.gmq?num(s.gmq,1)+' g/j':'—')+'</td><td>'+fpct(s.mort)+'</td><td>'+(s.present<=0?'—':s.ready?'atteinte':s.est?fdate(s.est).slice(0,5):'—')+'</td></tr>'}).join('')+'</tbody></table></div>':empty('Aucun lot à comparer.'))+'</section>';
+  var abs=by(S.abattages,'date').reverse();
+  h+='<section class="blk"><div class="h2row"><h2>Fiches d’abattage</h2></div><div class="list">'+(abs.length?abs.map(function(a){var r=pct(a.carcasse,a.vif),pm=a.n-a.pertes>0?a.carcasse/(a.n-a.pertes):0;
+    return '<button class="row" data-act="editSlaughter" data-id="'+a.id+'"><div class="main"><div class="t">'+fdate(a.date)+' · lot '+esc(lotLabel(a.lotId))+' · '+a.n+' lapins</div><div class="s">Vif '+num(a.vif,2)+' kg → carcasse '+num(a.carcasse,2)+' kg · '+num(pm,2)+' kg la pièce'+(a.pertes?' · '+a.pertes+' perte(s)':'')+'</div></div><div class="end">'+fpct(r)+'</div></button>'}).join(''):empty('Aucun abattage enregistré.'))+'</div></section><button class="fab" data-act="slaughter">+ Abattage</button>';
+  return h}
+document.addEventListener('change',function(e){if(e.target.id==='selChart'){UI.sel=e.target.value;render()}});
+function slaughterFields(){return[
+  {k:'lotId',l:'Lot d’origine',t:'select',opts:lotOpts(false),req:1},
+  {k:'date',l:'Date d’abattage',t:'date',req:1,half:1},{k:'n',l:'Lapins abattus',t:'number',step:'1',req:1,half:1},
+  {k:'vif',l:'Poids vif total',hint:'kg',t:'number',req:1,half:1},{k:'carcasse',l:'Poids carcasse total',hint:'kg',t:'number',req:1,half:1},
+  {k:'pertes',l:'Pertes ou déclassements',hint:'nombre de carcasses',t:'number',step:'1',def:0},{k:'notes',l:'Notes',t:'area'}]}
+function slaughterLive(v){
+  if(!v.vif||!v.carcasse)return 'Le rendement s’affichera ici : poids de carcasse ÷ poids vif × 100.';
+  var r=pct(v.carcasse,v.vif),k=(v.n||0)-(v.pertes||0),pm=k>0?v.carcasse/k:0;
+  return '<b>Rendement carcasse : '+fpct(r)+'</b> (calculé)'+(k>0?'<br>Poids moyen de carcasse : '+num(pm,2)+' kg pour un objectif de '+num(cfg().cibleCarcasse,2)+' kg':'')}
+function checkSlaughter(v,cur){
+  var l=find(S.lots,v.lotId),room=lotStats(l).present+(cur&&cur.lotId===v.lotId?cur.n:0);
+  if(v.n<1)return 'Indiquer au moins 1 lapin.';if(v.n>room)return 'Il ne reste que '+room+' animaux dans ce lot.';
+  if(v.vif<=0||v.carcasse<=0)return 'Les poids doivent être positifs.';
+  if(v.carcasse>=v.vif)return 'Le poids de carcasse doit être inférieur au poids vif. Vérifier les deux valeurs.';
+  if((v.pertes||0)>v.n)return 'Les pertes dépassent le nombre abattu.';return ''}
+ACT.slaughter=function(d){
+  form('Fiche d’abattage',slaughterFields(),{lotId:d.id||(lotOpts(true)[0]||[''])[0],date:today(),pertes:0},function(v){
+    var e=checkSlaughter(v);if(e)return e;v.pertes=v.pertes||0;v.id=uid('ab');S.abattages.push(v);logOp('Abattage '+lotLabel(v.lotId)+' : '+v.n);commit('Abattage enregistré')},
+    {live:slaughterLive,intro:'Le poids vif est celui des animaux avant abattage. Le poids de carcasse est mesuré après préparation.'})};
+ACT.editSlaughter=function(d){
+  var a=find(S.abattages,d.id);
+  form('Modifier l’abattage',slaughterFields(),a,function(v){var e=checkSlaughter(v,a);if(e)return e;v.pertes=v.pertes||0;Object.keys(v).forEach(function(k){a[k]=v[k]});logOp('Abattage modifié : '+lotLabel(a.lotId));commit('Abattage mis à jour')},
+    {live:slaughterLive,del:function(){confirmSheet('Supprimer cette fiche d’abattage ? Les lapins retournent dans l’effectif du lot.',function(){S.abattages=S.abattages.filter(function(x){return x.id!==a.id});logOp('Abattage supprimé : '+lotLabel(a.lotId));commit('Fiche supprimée')},'Supprimer')}})};
+
+/* ---------- reproduction ---------- */
+function perfStats(){
+  var t=today(),g=cfg().gestation;
+  var closed=S.breedings.filter(function(b){return b.miseBas||b.palpation==='negatif'||addDays(b.saillie,g+3)<t});
+  var mb=S.breedings.filter(function(b){return b.miseBas});
+  var weaned=S.breedings.filter(function(b){return b.sevrageDate});
+  var nes=sum(mb,'nes'),nesW=sum(weaned.map(function(b){return{v:(b.nes||0)+(b.adopt||0)}}),'v'),sev=sum(weaned,'sevres');
+  var fem={};S.breedings.forEach(function(b){(fem[b.femelle]=fem[b.femelle]||[]).push(b)});
+  return{taux:pct(mb.length,closed.length),nClosed:closed.length,nMB:mb.length,taille:mb.length?nes/mb.length:null,
+    mort:nesW>0?pct(nesW-sev,nesW):null,parFemelle:Object.keys(fem).length?sev/Object.keys(fem).length:null,sev:sev,fem:fem}}
+function vRepro(){
+  var h=seg('repro',[['femelles','Saillies'],['perf','Indicateurs']]);
+  if(UI.seg.repro==='femelles'){
+    var bs=by(S.breedings,'saillie').reverse();
+    h+='<section class="blk"><div class="list">'+(bs.length?bs.map(function(b){var st=breedStatus(b),mb=b.miseBas?'':addDays(b.saillie,cfg().gestation);
+      return '<button class="row" data-act="openBreed" data-id="'+b.id+'"><div class="main"><div class="t">'+esc(animalLabel(b.femelle))+'</div><div class="s">Saillie '+fdate(b.saillie)+' avec '+esc(b.male?animalLabel(b.male):'mâle non précisé')+(mb?' · mise bas prévue '+fdate(mb):' · '+b.nes+' nés vivants'+(b.mortNes?', '+b.mortNes+' mort-nés':''))+'</div></div><div class="end">'+pill(st.l,st.c)+'</div></button>'}).join(''):empty('Aucune saillie enregistrée.'))+'</div></section><button class="fab" data-act="newBreed">+ Saillie</button>';
+  }else{
+    var p=perfStats();
+    h+='<section class="blk"><div class="grid">'+kpi(fpct(p.taux),'taux de mise bas ('+p.nMB+' sur '+p.nClosed+')')+kpi(p.taille==null?'—':num(p.taille,1),'nés vivants par portée')+kpi(fpct(p.mort),'mortalité avant sevrage')+kpi(p.parFemelle==null?'—':num(p.parFemelle,1),'sevrés par femelle')+'</div>'+
+    '<p class="small">Taux de mise bas : mises bas ÷ saillies terminées (mise bas faite, palpation négative ou terme dépassé de 3 jours). Mortalité avant sevrage : (nés vivants + adoptions − sevrés) ÷ (nés vivants + adoptions), sur les portées déjà sevrées.</p></section>'+
+    '<section class="blk"><div class="h2row"><h2>Par femelle</h2></div>'+(Object.keys(p.fem).length?'<div class="card scroll-x"><table><thead><tr><th>Femelle</th><th>Saillies</th><th>Mises bas</th><th>Nés vivants</th><th>Sevrés</th></tr></thead><tbody>'+Object.keys(p.fem).map(function(id){var a=p.fem[id];return '<tr><td><b>'+esc(animalLabel(id))+'</b></td><td>'+a.length+'</td><td>'+a.filter(function(b){return b.miseBas}).length+'</td><td>'+sum(a,'nes')+'</td><td>'+sum(a,'sevres')+'</td></tr>'}).join('')+'</tbody></table></div>':empty('Pas encore de données.'))+'</section>'}
+  return h}
+ACT.newBreed=function(){
+  form('Nouvelle saillie',[{k:'femelle',l:'Femelle',t:'select',opts:opts(animalOpts('F'),'Choisir'),req:1},{k:'male',l:'Mâle utilisé',t:'select',opts:opts(animalOpts('M'),'Non précisé')},{k:'saillie',l:'Date de saillie',t:'date',req:1}],{saillie:today()},function(v){
+    if(S.breedings.some(function(b){return b.femelle===v.femelle&&!b.miseBas&&b.palpation!=='negatif'}))return 'Cette femelle a déjà une saillie en cours.';
+    S.breedings.push({id:uid('b'),femelle:v.femelle,male:v.male,saillie:v.saillie,palpation:'attente',miseBas:'',nes:0,mortNes:0,adopt:0,sevrageDate:'',sevres:0,gardes:0,notes:''});
+    commit('Saillie enregistrée')},{intro:'La mise bas sera prévue '+cfg().gestation+' jours après la saillie (modifiable dans les paramètres).'})};
+ACT.openBreed=function(d){
+  var b=find(S.breedings,d.id);if(!b)return;var st=breedStatus(b);
+  var h='<h2>'+esc(animalLabel(b.femelle))+'</h2><div class="small">'+pill(st.l,st.c)+'</div><div class="card" style="margin-top:10px">'+
+    kv('Mâle',b.male?esc(animalLabel(b.male)):'—')+kv('Saillie',fdate(b.saillie))+kv('Palpation',b.palpation==='positif'?'Positive':b.palpation==='negatif'?'Négative':'En attente (vers le '+fdate(addDays(b.saillie,cfg().palpation))+')')+
+    kv('Mise bas prévue',fdate(addDays(b.saillie,cfg().gestation)))+(b.miseBas?kv('Mise bas observée',fdate(b.miseBas))+kv('Nés vivants / mort-nés',b.nes+' / '+b.mortNes)+(b.adopt?kv('Adoptions (net)',(b.adopt>0?'+':'')+b.adopt):''):'')+
+    (b.sevrageDate?kv('Sevrage',fdate(b.sevrageDate))+kv('Sevrés (dont renouvellement)',b.sevres+' ('+b.gardes+')'):b.miseBas?kv('Sevrage prévu',fdate(addDays(b.miseBas,cfg().sevrage))):'')+'</div><div class="btns">';
+  if(!b.miseBas&&b.palpation!=='negatif')h+='<button class="btn" data-act="palpation" data-id="'+b.id+'">Palpation</button><button class="btn pri" data-act="birth" data-id="'+b.id+'">Mise bas</button>';
+  if(b.miseBas&&!b.sevrageDate)h+='<button class="btn pri" data-act="wean" data-id="'+b.id+'">Sevrage</button>';
+  h+='<button class="btn dng" data-act="delBreed" data-id="'+b.id+'">Supprimer</button><button class="btn" data-act="close">Fermer</button></div>';
+  openSheet(h)};
+ACT.palpation=function(d){
+  var b=find(S.breedings,d.id);
+  form('Contrôle de gestation',[{k:'r',l:'Résultat',t:'select',opts:[['attente','En attente'],['positif','Positif (gestante)'],['negatif','Négatif (non gestante)']]}],{r:b.palpation},function(v){b.palpation=v.r;commit('Résultat enregistré')},{intro:'Femelle : '+esc(animalLabel(b.femelle))})};
+ACT.birth=function(d){
+  var b=find(S.breedings,d.id);
+  form('Mise bas',[{k:'date',l:'Date de mise bas',t:'date',req:1},{k:'nes',l:'Nés vivants',t:'number',step:'1',req:1,half:1},{k:'mortNes',l:'Mort-nés',t:'number',step:'1',half:1},{k:'adopt',l:'Adoptions',hint:'+ reçus, − donnés',t:'number',step:'1',min:-50,def:0}],{date:today(),mortNes:0,adopt:0},function(v){
+    if(v.date<b.saillie)return 'La mise bas précède la saillie.';
+    b.miseBas=v.date;b.palpation='positif';b.nes=v.nes;b.mortNes=v.mortNes||0;b.adopt=v.adopt||0;logOp('Mise bas : '+animalLabel(b.femelle));commit('Mise bas enregistrée')})};
+ACT.wean=function(d){
+  var b=find(S.breedings,d.id),tot=(b.nes||0)+(b.adopt||0);
+  form('Sevrage',[{k:'date',l:'Date de sevrage',t:'date',req:1},{k:'sevres',l:'Sevrés',t:'number',step:'1',req:1,half:1},{k:'gardes',l:'Gardés pour le renouvellement',t:'number',step:'1',half:1,def:0},
+    {k:'mk',l:'Créer un lot d’engraissement avec les autres',t:'chk',def:true},{k:'pm',l:'Poids moyen au sevrage',hint:'g',t:'number'},{k:'cage',l:'Bâtiment ou cage du lot'}],{date:today(),sevres:tot,gardes:0,mk:true,pm:700},function(v){
+    if(v.sevres<0||v.sevres>tot)return 'Sevrés : entre 0 et '+tot+' (nés vivants + adoptions).';
+    if((v.gardes||0)>v.sevres)return 'Les gardés dépassent les sevrés.';
+    if(v.date<b.miseBas)return 'Le sevrage précède la mise bas.';
+    b.sevrageDate=v.date;b.sevres=v.sevres;b.gardes=v.gardes||0;
+    var n=v.sevres-b.gardes;
+    if(v.mk&&n>0){if(!v.pm)return 'Indiquer le poids moyen au sevrage.';var k=S.lots.length;S.lots.push({id:uid('l'),num:'L-'+('00'+k).slice(-3),constitution:v.date,origine:'Portée '+animalLabel(b.femelle),initial:n,naissance:b.miseBas,poidsInit:v.pm,categorie:'Engraissement',cage:v.cage,notes:''})}
+    logOp('Sevrage : '+animalLabel(b.femelle));commit(v.mk&&n>0?'Sevrage enregistré, lot créé':'Sevrage enregistré')},{intro:'Portée de '+esc(animalLabel(b.femelle))+' : '+tot+' lapereaux à compter.'})};
+ACT.delBreed=function(d){var b=find(S.breedings,d.id);confirmSheet('Supprimer cette saillie et ses résultats ?',function(){S.breedings=S.breedings.filter(function(x){return x.id!==b.id});logOp('Saillie supprimée : '+animalLabel(b.femelle));commit('Saillie supprimée')},'Supprimer')};
+
+/* ---------- argent : ventes, dépenses, résultats ---------- */
+var MODES=[['Espèces','Espèces'],['Mobile money','Mobile money'],['Virement','Virement'],['Chèque','Chèque'],['Crédit','À crédit']];
+function stockFor(cat,lotId){var l=find(S.lots,lotId);if(!l)return 0;var s=lotStats(l);return cat==='vif'||cat==='sevre'?s.present:s.carcStock}
+function autoPrice(cat,poids){
+  var p=cfg().prix,t=cfg().tranches;
+  if(cat==='carcasse'){if(!poids)return null;for(var i=0;i<t.length;i++)if(poids>=t[i].min&&poids<t[i].max)return t[i].prix;return t[t.length-1].prix}
+  return p[cat]}
+function trancheLabel(poids){var t=cfg().tranches;for(var i=0;i<t.length;i++)if(poids>=t[i].min&&poids<t[i].max)return i===0?'moins de '+num(t[0].max,2)+' kg':i===t.length-1?num(t[i].min,2)+' kg et plus':num(t[i].min,2)+' à moins de '+num(t[i].max,2)+' kg';return ''}
+function vArgent(){
+  var h=seg('argent',[['ventes','Ventes'],['depenses','Dépenses'],['stock','Stock'],['resultats','Résultats']]),g=UI.seg.argent;
+  if(g==='stock')return h+vStock();
+  if(g==='ventes'){
+    var vs=by(S.sales,'date').reverse();
+    h+='<section class="blk"><div class="list">'+(vs.length?vs.map(function(s){var net=salesNet(s),solde=net-(Number(s.encaisse)||0);
+      return '<button class="row" data-act="editSale" data-id="'+s.id+'"><div class="main"><div class="t">'+esc(s.num)+' · '+esc(s.client||'Client non précisé')+'</div><div class="s">'+fdate(s.date)+' · '+s.qte+' × '+esc(CAT_LABEL[s.cat])+(s.cat==='carcasse'&&s.poids?' ('+num(s.poids,2)+' kg)':'')+(s.force?' · autorisation spéciale':'')+'</div></div><div class="end">'+money(net)+'<div>'+(solde>0?pill('Reste '+money(solde),'warn'):pill('Soldé','good'))+'</div></div></button>'}).join(''):empty('Aucune vente enregistrée.'))+'</div></section><button class="fab" data-act="newSale">+ Vente</button>';
+  }else if(g==='depenses'){
+    var xs=by(S.expenses.filter(function(x){return inP(x.date)}),'date').reverse(),inc=by(S.incomes.filter(function(x){return inP(x.date)}),'date').reverse();
+    h+=filterRow().replace(/<select id="selLot"[\s\S]*?<\/select>/,'');
+    h+='<section class="blk"><div class="list">'+(xs.length?xs.map(function(x){return '<button class="row" data-act="editExp" data-id="'+x.id+'"><div class="main"><div class="t">'+esc(x.cat)+'</div><div class="s">'+fdate(x.date)+(x.lotId?' · lot '+esc(lotLabel(x.lotId)):' · charge commune')+(x.note?' · '+esc(x.note):'')+'</div></div><div class="end">'+money(x.montant)+'</div></button>'}).join(''):empty('Aucune dépense sur cette période.'))+'</div></section>';
+    h+='<section class="blk"><div class="h2row"><h2>Autres recettes</h2><button class="btn sm" data-act="newInc">+ Recette</button></div><div class="list">'+(inc.length?inc.map(function(x){return '<button class="row" data-act="editInc" data-id="'+x.id+'"><div class="main"><div class="t">'+esc(x.note||'Autre recette')+'</div><div class="s">'+fdate(x.date)+'</div></div><div class="end">'+money(x.montant)+'</div></button>'}).join(''):'<div class="small">Les ventes de lapins sont comptées automatiquement. Ne saisir ici que les autres recettes (fumier, subvention…).</div>')+'</div></section><button class="fab" data-act="newExp">+ Dépense</button>';
+  }else{
+    var sv=S.sales.filter(function(s){return inP(s.date)}),ca=sum(sv.map(function(s){return{v:salesNet(s)}}),'v'),enc=sum(sv,'encaisse'),oth=sum(S.incomes.filter(function(x){return inP(x.date)}),'montant');
+    var ex=S.expenses.filter(function(x){return inP(x.date)}),dep=sum(ex,'montant');
+    var brute=ca-sum(ex.filter(function(x){return x.cat==='Aliments'||x.cat==='Produits vétérinaires'}),'montant');
+    var exCout=sum(ex.filter(function(x){return x.cat!=='Achat de reproducteurs'}),'montant');
+    var vendus=sum(sv.filter(function(s){return s.cat!=='reproducteur'}),'qte'),kgC=sum(S.abattages.filter(function(a){return inP(a.date)}),'carcasse');
+    h+=filterRow().replace(/<select id="selLot"[\s\S]*?<\/select>/,'');
+    h+='<section class="blk"><div class="h2row"><h2>Compte de gestion</h2></div><div class="grid">'+kpi(money(ca),'chiffre d’affaires')+kpi(money(dep),'dépenses')+kpi(money(ca+oth-dep),'bénéfice ou déficit estimé','hero')+'</div>'+
+    '<div class="card" style="margin-top:8px">'+kv('Encaissé sur les ventes',money(enc))+kv('Reste à encaisser',money(ca-enc))+kv('Autres recettes',money(oth))+kv('Marge brute estimée',money(brute))+kv('Coût de revient par lapin vendu',vendus?money(exCout/vendus):'—')+kv('Coût de revient par kg de carcasse',kgC?money(exCout/kgC):'—')+'</div>'+
+    '<p class="small">Marge brute = ventes − aliments − produits vétérinaires. Coût de revient = toutes les dépenses sauf l’achat de reproducteurs, divisées par les lapins vendus ou les kg de carcasse produits sur la période. Ce sont des estimations.</p></section>';
+    h+='<section class="blk"><div class="h2row"><h2>Dépenses par catégorie</h2></div>'+(dep?'<div class="card">'+CATS_DEP.map(function(c){var m=sum(ex.filter(function(x){return x.cat===c}),'montant');return m?kv(esc(c),money(m)+' · '+num(m/dep*100)+' %'):''}).join('')+'</div>':empty('Aucune dépense sur cette période.'))+'</section>';
+    h+='<section class="blk"><div class="h2row"><h2>Bilan par lot</h2><span class="small">Depuis la création</span></div><div class="list">'+(S.lots.length?S.lots.map(function(l){var b=lotBilan(l);
+      return '<button class="row" data-act="openLot" data-id="'+l.id+'"><div class="main"><div class="t">Lot '+esc(l.num)+'</div><div class="s">Ventes '+money(b.ca)+' · coût '+money(b.cout)+(b.parLapin!=null?' · '+money(b.parLapin)+' par lapin vendu':'')+(b.parKg!=null?' · '+money(b.parKg)+' par kg de carcasse':'')+'</div></div><div class="end" style="color:var(--'+(b.marge<0?'bad':'good')+')">'+money(b.marge)+'</div></button>'}).join(''):empty('Aucun lot.'))+'</div>'+
+    '<p class="small">Coût d’un lot = aliment distribué × prix du kilo (paramètres) + dépenses rattachées au lot + part des charges communes ('+(cfg().repartition==='effectif'?'répartie selon l’effectif initial':'non répartie')+'). Les achats d’aliments et de reproducteurs ne sont pas répartis, pour éviter un double comptage.</p></section>'}
+  return h}
+function saleFields(){return[
+  {k:'date',l:'Date',t:'date',req:1,half:1},{k:'mode',l:'Paiement',t:'select',opts:MODES,half:1},
+  {k:'client',l:'Client',half:1},{k:'tel',l:'Téléphone',t:'tel',half:1},
+  {k:'cat',l:'Catégorie',t:'select',opts:Object.keys(CAT_LABEL).map(function(k){return[k,CAT_LABEL[k]]}),req:1},
+  {k:'lotId',l:'Lot',t:'select',opts:opts(lotOpts(false),'Choisir un lot')},{k:'animalId',l:'Reproducteur vendu',t:'select',opts:opts(animalOpts(''),'Choisir')},
+  {k:'qte',l:'Quantité',t:'number',step:'1',req:1,half:1},{k:'poids',l:'Poids moyen de carcasse',hint:'kg',t:'number',half:1},
+  {k:'prixUnit',l:'Prix unitaire',hint:'FCFA',t:'number',req:1,half:1},{k:'remise',l:'Remise',hint:'FCFA',t:'number',def:0,half:1},
+  {k:'encaisse',l:'Montant encaissé',hint:'FCFA',t:'number',def:0},{k:'resp',l:'Responsable de la vente'},
+  {k:'force',l:'Autoriser malgré un stock insuffisant ou un délai d’attente (sera consigné)',t:'chk'}]}
+function saleLive(state){return function(v,set,show){
+  var c=v.cat;show('lotId',c!=='reproducteur');show('animalId',c==='reproducteur');show('poids',c==='carcasse');
+  var ap=autoPrice(c,v.poids),key=c+'|'+(v.poids||'');
+  if(ap!=null&&state.key!==key&&(v.prixUnit==null||v.prixUnit===state.auto)){set('prixUnit',ap);v.prixUnit=ap}
+  if(ap!=null)state.auto=ap;state.key=key;
+  if(c==='reproducteur'&&!v.qte){set('qte',1);v.qte=1}
+  var net=(v.qte||0)*(v.prixUnit||0)-(v.remise||0),info='';
+  if(c!=='reproducteur'&&v.lotId){var st=stockFor(c,v.lotId)+(state.cur&&state.cur.lotId===v.lotId&&((c==='vif'||c==='sevre')===(state.cur.cat==='vif'||state.cur.cat==='sevre'))?state.cur.qte:0);
+    info+='Stock disponible : <b>'+st+'</b>'+(v.qte>st?' <span style="color:var(--bad)">(insuffisant)</span>':'')+'<br>'}
+  var at=(c==='vif'||c==='abattu'||c==='carcasse')&&v.lotId?attenteLot(v.lotId):null;
+  if(at)info+='<span style="color:var(--bad)">Délai d’attente en cours jusqu’au '+fdate(at)+'. Ne pas vendre pour la consommation avant.</span><br>';
+  if(c==='carcasse'&&v.poids)info+='Tranche : '+trancheLabel(v.poids)+'<br>';
+  return info+'Total net : <b>'+money(net)+'</b> · reste à encaisser : <b>'+money(net-(v.encaisse||0))+'</b>'}}
+function saleSave(cur){return function(v){
+  if(v.qte<1||v.qte!==Math.floor(v.qte))return 'La quantité doit être un entier d’au moins 1.';
+  if(v.prixUnit<0||(v.remise||0)<0)return 'Prix et remise ne peuvent pas être négatifs.';
+  var net=v.qte*v.prixUnit-(v.remise||0);if(net<0)return 'La remise dépasse le montant de la vente.';
+  if((v.encaisse||0)>net)return 'Le montant encaissé dépasse le total de la vente.';
+  if(v.cat==='carcasse'&&!v.poids)return 'Indiquer le poids moyen de carcasse pour appliquer la bonne tranche.';
+  var forced=false;
+  if(v.cat==='reproducteur'){if(!v.animalId)return 'Choisir le reproducteur vendu.';if(v.qte!==1)return 'Un reproducteur se vend à l’unité.';v.lotId=''}
+  else{if(!v.lotId)return 'Choisir le lot.';v.animalId='';
+    var st=stockFor(v.cat,v.lotId)+(cur&&cur.lotId===v.lotId&&((v.cat==='vif'||v.cat==='sevre')===(cur.cat==='vif'||cur.cat==='sevre'))?cur.qte:0);
+    if(v.qte>st){if(!v.force)return 'Stock insuffisant : '+st+' disponible. Cocher l’autorisation pour continuer, elle sera consignée.';forced=true}
+    var at=(v.cat==='vif'||v.cat==='abattu'||v.cat==='carcasse')?attenteLot(v.lotId):null;
+    if(at){if(!v.force)return 'Délai d’attente en cours jusqu’au '+fdate(at)+'. Cocher l’autorisation pour vendre malgré tout, elle sera consignée.';forced=true}}
+  v.force=forced;v.encaisse=v.encaisse||0;v.remise=v.remise||0;v.poids=v.cat==='carcasse'?v.poids:0;
+  if(cur){Object.keys(v).forEach(function(k){cur[k]=v[k]});logOp('Vente modifiée : '+cur.num+(forced?' (stock forcé)':''))}
+  else{v.id=uid('v');v.num='V-'+('0000'+(S.sales.length+1)).slice(-4);S.sales.push(v);logOp('Vente '+v.num+(forced?' (stock forcé)':''))}
+  if(v.cat==='reproducteur'){var a=find(S.animals,v.animalId);if(a)a.statut='vendu'}
+  commit('Vente enregistrée')}}
+ACT.newSale=function(){var st={};
+  form('Nouvelle vente',saleFields(),{date:today(),mode:'Espèces',cat:'vif',lotId:(lotOpts(true)[0]||[''])[0],qte:1,resp:'',encaisse:0},saleSave(null),{live:saleLive(st),ok:'Enregistrer la vente'})};
+ACT.editSale=function(d){
+  var s=find(S.sales,d.id),st={cur:{lotId:s.lotId,cat:s.cat,qte:s.qte},auto:s.prixUnit,key:s.cat+'|'+(s.poids||'')};
+  form('Vente '+s.num,saleFields(),s,saleSave(s),{live:saleLive(st),extra:'<button class="btn" type="button" data-act="invoice" data-id="'+s.id+'">Facture PDF</button>',del:function(){confirmSheet('Supprimer la vente '+esc(s.num)+' ? L’effectif ou le stock du lot sera rétabli. Cette opération est consignée.',function(){
+    S.sales=S.sales.filter(function(x){return x.id!==s.id});logOp('Vente supprimée : '+s.num);commit('Vente supprimée')},'Supprimer')}})};
+function expFields(){return[{k:'date',l:'Date',t:'date',req:1,half:1},{k:'montant',l:'Montant',hint:'FCFA',t:'number',req:1,half:1},
+  {k:'cat',l:'Catégorie',t:'select',opts:CATS_DEP.map(function(c){return[c,c]})},{k:'lotId',l:'Rattacher à un lot',t:'select',opts:opts(lotOpts(false),'Non, charge commune')},{k:'note',l:'Note'}]}
+ACT.newExp=function(){form('Nouvelle dépense',expFields(),{date:today(),cat:'Aliments'},function(v){
+  if(v.montant<=0)return 'Le montant doit être positif.';v.id=uid('x');S.expenses.push(v);commit('Dépense enregistrée')},{intro:'Rattachez la dépense à un lot seulement si elle ne profite qu’à lui. Sinon elle est répartie selon la méthode choisie dans les paramètres.'})};
+ACT.editExp=function(d){var x=find(S.expenses,d.id);form('Modifier la dépense',expFields(),x,function(v){
+  if(v.montant<=0)return 'Le montant doit être positif.';Object.keys(v).forEach(function(k){x[k]=v[k]});logOp('Dépense modifiée : '+x.cat+' '+x.montant);commit('Dépense mise à jour')},
+  {del:function(){confirmSheet('Supprimer cette dépense ?',function(){S.expenses=S.expenses.filter(function(y){return y.id!==x.id});logOp('Dépense supprimée : '+x.cat+' '+x.montant);commit('Dépense supprimée')},'Supprimer')}})};
+function incFields(){return[{k:'date',l:'Date',t:'date',req:1,half:1},{k:'montant',l:'Montant',hint:'FCFA',t:'number',req:1,half:1},{k:'note',l:'Nature de la recette',req:1}]}
+ACT.newInc=function(){form('Autre recette',incFields(),{date:today()},function(v){if(v.montant<=0)return 'Le montant doit être positif.';v.id=uid('i');S.incomes.push(v);commit('Recette enregistrée')},{intro:'Pour les recettes qui ne sont pas des ventes de lapins.'})};
+ACT.editInc=function(d){var x=find(S.incomes,d.id);form('Modifier la recette',incFields(),x,function(v){if(v.montant<=0)return 'Le montant doit être positif.';Object.keys(v).forEach(function(k){x[k]=v[k]});logOp('Recette modifiée : '+x.montant);commit('Recette mise à jour')},
+  {del:function(){confirmSheet('Supprimer cette recette ?',function(){S.incomes=S.incomes.filter(function(y){return y.id!==x.id});logOp('Recette supprimée : '+x.montant);commit('Recette supprimée')},'Supprimer')}})};
+
+/* ---------- phase 2 : santé ---------- */
+var HTYPES=[['traitement','Traitement'],['vaccination','Vaccination'],['prevention','Mesure préventive'],['consultation','Consultation']];
+function htLabel(t){for(var i=0;i<HTYPES.length;i++)if(HTYPES[i][0]===t)return HTYPES[i][1];return t}
+function cibleLabel(h){return h.lotId?'Lot '+lotLabel(h.lotId):animalLabel(h.animalId)}
+function vSante(){
+  var hs=by(S.health,'date').reverse(),t=today();
+  var h='<section class="blk"><div class="card small">L’application ne pose aucun diagnostic et ne propose aucun médicament. Notez ici les soins après validation par le vétérinaire ou une personne compétente.</div></section>';
+  h+='<section class="blk"><div class="list">'+(hs.length?hs.map(function(x){var f=attenteFin(x),act=f&&f>=t;
+    return '<button class="row" data-act="editHealth" data-id="'+x.id+'"><div class="main"><div class="t">'+esc(htLabel(x.type))+' · '+esc(cibleLabel(x))+'</div><div class="s">'+fdate(x.date)+(x.produit?' · '+esc(x.produit):'')+(x.symptomes?' · '+esc(x.symptomes):'')+'</div></div><div class="end">'+(act?pill('Attente jusqu’au '+fdate(f).slice(0,5),'warn'):(x.suivi&&!x.done?pill('Suivi '+fdate(x.suivi).slice(0,5),''):''))+'</div></button>'}).join(''):empty('Aucun soin enregistré.'))+'</div></section><button class="fab" data-act="newHealth">+ Soin</button>';
+  return h}
+function healthFields(){return[
+  {k:'date',l:'Date',t:'date',req:1,half:1},{k:'type',l:'Nature',t:'select',opts:HTYPES,half:1},
+  {k:'lotId',l:'Lot concerné',t:'select',opts:opts(lotOpts(false),'Aucun lot')},{k:'animalId',l:'Animal concerné',t:'select',opts:opts(animalOpts(''),'Aucun animal')},
+  {k:'symptomes',l:'Symptômes observés',t:'area'},{k:'diagnostic',l:'Diagnostic'},{k:'diagnosticPar',l:'Diagnostic ou traitement validé par',ph:'Nom du vétérinaire ou du responsable'},
+  {k:'produit',l:'Produit ou traitement administré'},{k:'dosage',l:'Dosage prescrit',half:1},{k:'duree',l:'Durée',hint:'jours',t:'number',step:'1',half:1},
+  {k:'delai',l:'Délai d’attente avant commercialisation',hint:'jours, selon la notice',t:'number',step:'1',def:0},
+  {k:'responsable',l:'Intervention réalisée par'},{k:'suivi',l:'Date de suivi',t:'date'},{k:'done',l:'Suivi effectué',t:'chk'},{k:'resultat',l:'Résultat observé',t:'area'}]}
+function healthLive(v){
+  if(v.type!=='traitement'||!v.date)return 'Cette fiche garde l’historique. Elle ne remplace pas l’avis du vétérinaire.';
+  var f=v.delai>0?addDays(v.date,(v.duree||0)+v.delai):null;
+  return f?'Délai d’attente : vente pour la consommation possible à partir du <b>'+fdate(addDays(f,1))+'</b>. Il sera signalé sur les ventes du lot. Vérifiez-le avec la notice du produit.':'Aucun délai d’attente indiqué. Vérifiez la notice du produit.'}
+function healthSave(cur){return function(v){
+  if(!!v.lotId===!!v.animalId)return 'Choisir soit un lot, soit un animal.';
+  if(v.type==='traitement'){if(!v.produit)return 'Indiquer le produit administré.';if(!v.diagnosticPar)return 'Indiquer qui a validé le traitement (vétérinaire ou personne compétente).'}
+  if((v.duree||0)<0||(v.delai||0)<0)return 'Durée et délai ne peuvent pas être négatifs.';
+  v.duree=v.duree||0;v.delai=v.delai||0;
+  if(cur){Object.keys(v).forEach(function(k){cur[k]=v[k]});logOp('Soin modifié : '+cibleLabel(cur))}else{v.id=uid('h');S.health.push(v);logOp('Soin ajouté : '+cibleLabel(v))}
+  commit('Soin enregistré')}}
+ACT.newHealth=function(d){form('Nouveau soin',healthFields(),{date:today(),type:'traitement',lotId:d.lot||'',animalId:d.animal||'',duree:0,delai:0},healthSave(null),{live:healthLive})};
+ACT.editHealth=function(d){var x=find(S.health,d.id);form('Soin du '+fdate(x.date),healthFields(),x,healthSave(x),{live:healthLive,del:function(){
+  confirmSheet('Supprimer cette fiche de soin ? Le délai d’attente associé disparaîtra des ventes. Cette opération est consignée.',function(){S.health=S.health.filter(function(y){return y.id!==x.id});logOp('Soin supprimé : '+cibleLabel(x));commit('Soin supprimé')},'Supprimer')}})};
+
+/* ---------- phase 2 : stock d'aliments ---------- */
+function vStock(){
+  var h='<section class="blk"><div class="h2row"><h2>Aliments et matières premières</h2><button class="btn sm" data-act="newItem">+ Produit</button></div><div class="list">'+(S.stock.length?S.stock.map(function(it){var q=itemQty(it),low=it.seuil>0&&q<=it.seuil;
+    return '<button class="row" data-act="openItem" data-id="'+it.id+'"><div class="main"><div class="t">'+esc(it.nom)+'</div><div class="s">Prix moyen d’achat '+money(itemAvg(it))+' par '+esc(it.unite)+' · seuil '+num(it.seuil)+' '+esc(it.unite)+'</div></div><div class="end">'+num(q,1)+' '+esc(it.unite)+'<div>'+(low?pill('Stock bas','bad'):'')+'</div></div></button>'}).join(''):empty('Aucun produit en stock. Ajoutez votre aliment pour suivre les achats et la consommation.'))+'</div></section>';
+  var mv=by(S.mvts,'date').reverse().slice(0,10);
+  if(mv.length)h+='<section class="blk"><div class="h2row"><h2>Derniers mouvements</h2></div><div class="list">'+mv.map(function(m){var it=find(S.stock,m.itemId),lab={achat:'Achat',perte:'Perte',ajustement:'Inventaire'}[m.type];
+    return '<button class="row" data-act="delMvt" data-id="'+m.id+'"><div class="main"><div class="t">'+lab+' · '+esc(it?it.nom:'—')+'</div><div class="s">'+fdate(m.date)+(m.fournisseur?' · '+esc(m.fournisseur):'')+(m.note?' · '+esc(m.note):'')+'</div></div><div class="end">'+(m.type==='perte'?'−':m.qte>0?'+':'')+num(m.qte,1)+' '+esc(it?it.unite:'')+'</div></button>'}).join('')+'</div></section>';
+  var cons=S.lots.map(function(l){return{l:l,kg:sum(S.feeds.filter(function(f){return f.lotId===l.id}),'kg')}}).filter(function(x){return x.kg>0});
+  if(cons.length)h+='<section class="blk"><div class="h2row"><h2>Consommation par lot</h2></div><div class="card">'+cons.map(function(x){var b=lotBilan(x.l);return kv('Lot '+esc(x.l.num),num(x.kg,1)+' kg · '+money(b.coutAlim))}).join('')+'</div><p class="small">Coût = kg distribués × prix moyen d’achat du produit. Les distributions se saisissent depuis la fiche d’un lot (bouton Aliment).</p></section>';
+  return h}
+ACT.newItem=function(){form('Nouveau produit',[{k:'nom',l:'Nom de l’aliment ou de la matière première',req:1},{k:'unite',l:'Unité',req:1,half:1},{k:'seuil',l:'Seuil minimal',t:'number',half:1}],{unite:'kg',seuil:50},function(v){
+  v.id=uid('s');S.stock.push(v);logOp('Produit ajouté : '+v.nom);commit('Produit ajouté')})};
+ACT.openItem=function(d){
+  var it=find(S.stock,d.id);if(!it)return;var q=itemQty(it);
+  var h='<h2>'+esc(it.nom)+'</h2><div class="grid" style="margin-top:10px">'+kpi(num(q,1)+' '+esc(it.unite),'stock théorique')+kpi(money(q*itemAvg(it)),'valeur estimée')+'</div><div class="card" style="margin-top:8px">'+kv('Prix moyen d’achat',money(itemAvg(it))+' par '+esc(it.unite))+kv('Seuil minimal',num(it.seuil)+' '+esc(it.unite))+kv('Distribué (total)',num(sum(S.feeds.filter(function(f){return f.itemId===it.id}),'kg'),1)+' '+esc(it.unite))+'</div>'+
+  '<div class="btns"><button class="btn pri" data-act="buyItem" data-id="'+it.id+'">Achat</button><button class="btn" data-act="countItem" data-id="'+it.id+'">Inventaire</button><button class="btn" data-act="lossItem" data-id="'+it.id+'">Perte</button><button class="btn" data-act="editItem" data-id="'+it.id+'">Modifier</button></div>';
+  openSheet(h)};
+ACT.editItem=function(d){var it=find(S.stock,d.id);form('Modifier le produit',[{k:'nom',l:'Nom',req:1},{k:'unite',l:'Unité',req:1,half:1},{k:'seuil',l:'Seuil minimal',t:'number',half:1}],it,function(v){
+  Object.keys(v).forEach(function(k){it[k]=v[k]});logOp('Produit modifié : '+it.nom);commit('Produit mis à jour')},
+  {del:function(){confirmSheet('Supprimer ce produit et ses mouvements ? Les distributions déjà saisies restent comptées dans les lots.',function(){S.stock=S.stock.filter(function(x){return x.id!==it.id});S.mvts=S.mvts.filter(function(m){return m.itemId!==it.id});S.feeds.forEach(function(f){if(f.itemId===it.id)f.itemId=''});logOp('Produit supprimé : '+it.nom);commit('Produit supprimé')},'Supprimer')}})};
+ACT.buyItem=function(d){
+  var it=find(S.stock,d.id);
+  form('Achat de '+it.nom,[{k:'date',l:'Date',t:'date',req:1,half:1},{k:'qte',l:'Quantité',hint:it.unite,t:'number',req:1,half:1},{k:'prix',l:'Prix unitaire',hint:'FCFA',t:'number',req:1,half:1},{k:'fournisseur',l:'Fournisseur',half:1},{k:'dep',l:'Créer aussi la dépense correspondante',t:'chk',def:true}],{date:today(),prix:Math.round(itemAvg(it)),dep:true},function(v){
+    if(v.qte<=0||v.prix<=0)return 'Quantité et prix doivent être positifs.';
+    var m={id:uid('m'),itemId:it.id,date:v.date,type:'achat',qte:v.qte,prix:v.prix,fournisseur:v.fournisseur,note:''};
+    if(v.dep){var x={id:uid('x'),date:v.date,cat:'Aliments',montant:Math.round(v.qte*v.prix),note:'Achat '+it.nom,lotId:''};S.expenses.push(x);m.expId=x.id}
+    S.mvts.push(m);logOp('Achat '+it.nom+' : '+v.qte);commit('Achat enregistré')},{live:function(v){return 'Total : <b>'+money((v.qte||0)*(v.prix||0))+'</b>'},intro:'Si la dépense est créée ici, ne la saisissez pas une seconde fois dans Dépenses.'})};
+ACT.lossItem=function(d){
+  var it=find(S.stock,d.id);
+  form('Perte de '+it.nom,[{k:'date',l:'Date',t:'date',req:1,half:1},{k:'qte',l:'Quantité',hint:it.unite,t:'number',req:1,half:1},{k:'note',l:'Motif',ph:'Humidité, rongeurs, déchet…'}],{date:today()},function(v){
+    if(v.qte<=0)return 'La quantité doit être positive.';if(v.qte>itemQty(it))return 'La perte dépasse le stock théorique.';
+    S.mvts.push({id:uid('m'),itemId:it.id,date:v.date,type:'perte',qte:v.qte,note:v.note});logOp('Perte '+it.nom+' : '+v.qte);commit('Perte enregistrée')})};
+ACT.countItem=function(d){
+  var it=find(S.stock,d.id),th=itemQty(it);
+  form('Inventaire de '+it.nom,[{k:'date',l:'Date',t:'date',req:1},{k:'reel',l:'Quantité comptée',hint:it.unite,t:'number',req:1}],{date:today()},function(v){
+    var ec=Math.round((v.reel-th)*100)/100;if(ec===0)return 'Le comptage correspond au stock théorique : rien à corriger.';
+    S.mvts.push({id:uid('m'),itemId:it.id,date:v.date,type:'ajustement',qte:ec,note:'Inventaire : théorique '+num(th,1)});logOp('Inventaire '+it.nom+' : écart '+ec);commit('Stock corrigé')},
+    {intro:'Stock théorique actuel : <b>'+num(th,1)+' '+esc(it.unite)+'</b>. L’écart sera enregistré comme un ajustement.',live:function(v){return v.reel==null?'':'Écart : <b>'+num(v.reel-th,1)+' '+esc(it.unite)+'</b>'}})};
+ACT.delMvt=function(d){
+  var m=find(S.mvts,d.id);if(!m)return;
+  confirmSheet('Supprimer ce mouvement de stock'+(m.expId?' et la dépense créée avec lui':'')+' ? Cette opération est consignée.',function(){
+    S.mvts=S.mvts.filter(function(x){return x.id!==m.id});if(m.expId)S.expenses=S.expenses.filter(function(x){return x.id!==m.expId});logOp('Mouvement de stock supprimé');commit('Mouvement supprimé')},'Supprimer')};
+
+/* ---------- phase 2 : factures et rapports PDF ---------- */
+function pp(s){return String(s==null?'':s).replace(/[’‘]/g,"'").replace(/[  ]/g,' ').replace(/[–—−]/g,'-').replace(/[→]/g,'>')}
+function pdfLib(){var J=window.jspdf&&window.jspdf.jsPDF;if(!J)toast('PDF indisponible : la bibliothèque ne s’est pas chargée. Reconnectez-vous une fois à Internet.');return J}
+function savePdf(name,doc){
+  if(!DL){toast('Enregistrement de fichier indisponible ici. Utilisez l’export CSV.');return}
+  DL.save({filename:name,data:doc.output('arraybuffer')}).then(function(){toast('PDF prêt')}).catch(function(e){if(!e||e.code!=='declined')toast('Enregistrement impossible')})}
+function pdfHead(doc,title,sub,M){doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(pp(cfg().ferme||'Nouvelle Ferme'),M,16);doc.setFontSize(12);doc.text(pp(title),M,23);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90);doc.text(pp(sub),M,28);doc.setTextColor(0)}
+function pdfTable(title,head,rows,w,fname){
+  var J=pdfLib();if(!J)return;
+  var land=head.length>5,doc=new J({orientation:land?'l':'p',unit:'mm',format:'a4'}),W=land?297:210,H=land?210:297,M=12;
+  var tw=sum(w),cw=w.map(function(x){return(W-2*M)*x/tw}),y;
+  var sub='Édité le '+fdate(today())+' · '+rows.length+' ligne'+(rows.length>1?'s':'');
+  var drawHead=function(){pdfHead(doc,title,sub,M);y=34;doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setFillColor(228,235,226);doc.rect(M,y-4.5,W-2*M,7,'F');var x=M;head.forEach(function(c,i){doc.text(pp(c),x+1,y);x+=cw[i]});y+=6;doc.setFont('helvetica','normal')};
+  drawHead();doc.setFontSize(8.5);
+  rows.forEach(function(r){
+    var cells=r.map(function(c,i){return doc.splitTextToSize(pp(c),cw[i]-2)}),n=Math.max.apply(null,cells.map(function(c){return c.length})),h=n*4+2;
+    if(y+h>H-14){doc.addPage();drawHead();doc.setFontSize(8.5)}
+    var x=M;cells.forEach(function(c,i){doc.text(c,x+1,y);x+=cw[i]});
+    doc.setDrawColor(210);doc.line(M,y+h-3.2,W-M,y+h-3.2);y+=h});
+  if(!rows.length){doc.text('Aucune donnée.',M+1,y)}
+  var pc=doc.getNumberOfPages();for(var p=1;p<=pc;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(120);doc.text('Page '+p+' / '+pc,W-M,H-8,{align:'right'})}
+  savePdf(fname,doc)}
+function who(x){return x.lotId?lotLabel(x.lotId):x.animalId?animalLabel(x.animalId):'—'}
+var REPORTS={
+  ventes:{t:'Rapport des ventes',h:['N°','Date','Client','Désignation','Qté','Net (FCFA)','Encaissé','Solde'],w:[10,12,22,28,6,14,14,12],r:function(){return by(S.sales,'date').map(function(s){return[s.num,fdate(s.date),s.client||'—',CAT_LABEL[s.cat]+(s.cat==='carcasse'&&s.poids?' '+num(s.poids,2)+' kg':'')+' · '+(s.lotId?lotLabel(s.lotId):animalLabel(s.animalId)),s.qte,num(salesNet(s)),num(s.encaisse),num(salesNet(s)-s.encaisse)]})}},
+  depenses:{t:'Rapport des dépenses',h:['Date','Catégorie','Rattachement','Note','Montant (FCFA)'],w:[12,26,20,30,16],r:function(){return by(S.expenses,'date').map(function(x){return[fdate(x.date),x.cat,x.lotId?'Lot '+lotLabel(x.lotId):'Charge commune',x.note||'',num(x.montant)]})}},
+  stock:{t:'État de stock',h:['Produit','Stock théorique','Seuil','Prix moyen (FCFA)','Valeur (FCFA)'],w:[30,18,14,18,18],r:function(){return S.stock.map(function(it){var q=itemQty(it);return[it.nom,num(q,1)+' '+it.unite,num(it.seuil)+' '+it.unite,num(itemAvg(it)),num(q*itemAvg(it))]})}},
+  sante:{t:'Rapport sanitaire',h:['Date','Cible','Nature','Produit','Dosage','Durée (j)','Attente jusqu’au','Validé par','Résultat'],w:[10,12,12,18,14,8,13,18,22],r:function(){return by(S.health,'date').map(function(x){var f=attenteFin(x);return[fdate(x.date),cibleLabel(x),htLabel(x.type),x.produit||'—',x.dosage||'—',x.duree||0,f?fdate(f):'—',x.diagnosticPar||'—',x.resultat||'—']})}},
+  repro:{t:'Registre de reproduction',h:['Femelle','Mâle','Saillie','Palpation','Mise bas','Nés vivants','Mort-nés','Sevrés'],w:[18,18,12,12,12,10,10,10],r:function(){return by(S.breedings,'saillie').map(function(b){return[animalLabel(b.femelle),b.male?animalLabel(b.male):'—',fdate(b.saillie),b.palpation==='positif'?'Positive':b.palpation==='negatif'?'Négative':'En attente',fdate(b.miseBas),b.miseBas?b.nes:'—',b.miseBas?b.mortNes:'—',b.sevrageDate?b.sevres:'—']})}},
+  pesees:{t:'Rapport de pesées',h:['Date','Lot ou animal','Pesés','Poids moyen (g)'],w:[14,24,12,16],r:function(){return by(S.weighings,'date').map(function(w){return[fdate(w.date),who(w),w.n||'—',num(w.g)]})}},
+  mortalites:{t:'Rapport de mortalité',h:['Date','Lot ou animal','Nombre','Cause'],w:[14,22,10,34],r:function(){return by(S.events.filter(function(e){return e.type==='mort'}),'date').map(function(e){return[fdate(e.date),who(e),e.n,e.cause||'—']})}},
+  lots:{t:'Fiches de lots',h:['Lot','Constitué','Initial','Présents','Mortalité','Poids moy. (g)','GMQ (g/j)','Aliment (kg)'],w:[12,14,10,10,12,14,12,12],r:function(){return S.lots.map(function(l){var s=lotStats(l);return[l.num,fdate(l.constitution),l.initial,s.present,fpct(s.mort),num(s.last.g),s.gmq?num(s.gmq,1):'—',num(s.fed,1)]})}},
+  bilan:{t:'Bilan de rentabilité par lot',h:['Lot','Ventes','Aliment','Dépenses du lot','Charges communes','Coût total','Résultat','Par lapin vendu','Par kg carcasse'],w:[10,14,14,14,14,14,14,14,14],r:function(){return S.lots.map(function(l){var b=lotBilan(l);return[l.num,num(b.ca),num(b.coutAlim),num(b.direct),num(b.alloc),num(b.cout),num(b.marge),b.parLapin!=null?num(b.parLapin):'—',b.parKg!=null?num(b.parKg):'—']})}},
+  abattages:{t:'Fiches d’abattage',h:['Date','Lot','Abattus','Vif (kg)','Carcasse (kg)','Rendement','Pertes'],w:[14,12,12,14,16,14,10],r:function(){return by(S.abattages,'date').map(function(a){return[fdate(a.date),lotLabel(a.lotId),a.n,num(a.vif,2),num(a.carcasse,2),fpct(pct(a.carcasse,a.vif)),a.pertes||0]})}},
+  cheptel:{t:'Fiches individuelles',h:['N°','Nom','Sexe','Race','Naissance','Cage','Statut','Poids (g)'],w:[10,14,8,18,12,10,14,10],r:function(){return by(S.animals,'num').map(function(a){return[a.num,a.nom||'—',a.sexe==='F'?'F':'M',a.race||'—',fdate(a.naissance),a.cage||'—',statLabel(a.statut),a.poids?num(a.poids):'—']})}}};
+var REPORT_ORDER=['ventes','depenses','bilan','lots','pesees','mortalites','abattages','repro','sante','stock','cheptel'];
+ACT.reports=function(){
+  var h='<h2>Rapports</h2><p class="small">Chaque rapport contient toutes les données enregistrées. Le PDF est fait pour être imprimé ou envoyé, le CSV s’ouvre dans Excel.</p><div class="list" style="margin-top:10px">'+REPORT_ORDER.map(function(k){var r=REPORTS[k];
+    return '<div class="row"><div class="main"><div class="t">'+esc(r.t)+'</div></div><div class="btns" style="margin:0"><button class="btn sm" data-act="repPdf" data-k="'+k+'">PDF</button><button class="btn sm" data-act="repCsv" data-k="'+k+'">CSV</button></div></div>'}).join('')+'</div><div class="btns"><button class="btn" data-act="close">Fermer</button></div>';
+  openSheet(h)};
+ACT.repPdf=function(d){var r=REPORTS[d.k];pdfTable(r.t,r.h,r.r(),r.w,d.k+'-'+today()+'.pdf')};
+ACT.repCsv=function(d){var r=REPORTS[d.k];saveFile(d.k+'-'+today()+'.csv',csv([r.h].concat(r.r())))};
+ACT.invoice=function(d){
+  var s=find(S.sales,d.id);if(!s)return;var J=pdfLib();if(!J)return;
+  var doc=new J({unit:'mm',format:'a4'}),M=18,W=210,net=salesNet(s),brut=s.qte*s.prixUnit;
+  pdfHead(doc,'FACTURE '+s.num,'Date : '+fdate(s.date)+(s.mode?' · Paiement : '+s.mode:''),M);
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('Client',M,42);doc.setFont('helvetica','normal');doc.text(pp(s.client||'Client non précisé'),M,48);if(s.tel)doc.text(pp(s.tel),M,53);
+  var y=66;doc.setFillColor(228,235,226);doc.rect(M,y-5,W-2*M,8,'F');doc.setFont('helvetica','bold');doc.setFontSize(9);
+  doc.text('Désignation',M+2,y);doc.text('Qté',112,y,{align:'right'});doc.text('Prix unitaire',148,y,{align:'right'});doc.text('Total',W-M-2,y,{align:'right'});
+  y+=9;doc.setFont('helvetica','normal');
+  var des=CAT_LABEL[s.cat]+(s.cat==='carcasse'&&s.poids?' - '+num(s.poids,2)+' kg ('+trancheLabel(s.poids)+')':'')+(s.lotId?' - lot '+lotLabel(s.lotId):s.animalId?' - '+animalLabel(s.animalId):'');
+  var dl=doc.splitTextToSize(pp(des),78);doc.text(dl,M+2,y);doc.text(String(s.qte),112,y,{align:'right'});doc.text(pp(num(s.prixUnit)),148,y,{align:'right'});doc.text(pp(num(brut)),W-M-2,y,{align:'right'});
+  y+=dl.length*5+6;doc.setDrawColor(200);doc.line(M,y-4,W-M,y-4);
+  var line=function(a,b,bold){doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(bold?11:10);doc.text(pp(a),130,y);doc.text(pp(b),W-M-2,y,{align:'right'});y+=bold?8:6};
+  line('Total brut',money(brut));if(s.remise)line('Remise','- '+money(s.remise));line('Net à payer',money(net),true);line('Encaissé',money(s.encaisse));line('Reste à payer',money(net-s.encaisse),true);
+  if(s.resp){doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90);doc.text('Vente enregistrée par : '+pp(s.resp),M,y+10);doc.setTextColor(0)}
+  doc.setFontSize(8);doc.setTextColor(120);doc.text('Document établi avec Nouvelle Ferme Cuniculture Pro',M,285);
+  savePdf('facture-'+s.num+'.pdf',doc)};
+
+/* ---------- paramètres, sauvegarde, export ---------- */
+function mimeOf(n){var e=(n.split('.').pop()||'').toLowerCase();return{json:'application/json',csv:'text/csv;charset=utf-8',pdf:'application/pdf',txt:'text/plain'}[e]||'application/octet-stream'}
+function stdSave(req){return new Promise(function(res,rej){
+  var blob=req.data instanceof Blob?req.data:new Blob([req.data],{type:mimeOf(req.filename)}),file=null;
+  try{file=new File([blob],req.filename,{type:mimeOf(req.filename)})}catch(e){}
+  var anchor=function(){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=req.filename;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000);res({status:'saved'})};
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:req.filename}).then(function(){res({status:'saved'})}).catch(function(e){if(e&&e.name==='AbortError')rej({code:'declined'});else anchor()})}
+  else anchor()})}
+var DL={save:stdSave};
+function showText(title,text,intro){openSheet('<h2>'+esc(title)+'</h2><p class="small">'+intro+'</p><textarea id="outText" readonly style="min-height:180px;font-size:12px">'+esc(text)+'</textarea><div class="btns"><button class="btn pri" data-act="selText">Tout sélectionner</button><button class="btn" data-act="close">Fermer</button></div>')}
+ACT.selText=function(){var t=$('#outText');t.focus();t.select()};
+function saveFile(name,data,onOk){
+  if(DL){DL.save({filename:name,data:data}).then(function(){toast('Fichier prêt');if(onOk)onOk()}).catch(function(e){if(e&&e.code==='declined')return;fallbackText(name,data,onOk)})}
+  else fallbackText(name,data,onOk)}
+function fallbackText(name,data,onOk){
+  var done=function(){if(onOk)onOk()};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(data).then(function(){toast('Contenu copié. Collez-le dans une note ou un message.');done()}).catch(function(){showText(name,data,'La copie automatique est refusée. Sélectionnez le texte puis copiez-le.')})}
+  else showText(name,data,'Sélectionnez le texte puis copiez-le.')}
+function csv(rows){return '﻿'+rows.map(function(r){return r.map(function(c){return '"'+String(c==null?'':c).replace(/"/g,'""')+'"'}).join(';')}).join('\n')}
+var EXPORTS={
+  ventes:function(){return csv([['Numéro','Date','Client','Catégorie','Lot','Quantité','Poids carcasse (kg)','Prix unitaire (FCFA)','Remise (FCFA)','Total net (FCFA)','Encaissé (FCFA)','Solde (FCFA)','Paiement','Responsable']].concat(by(S.sales,'date').map(function(s){return[s.num,s.date,s.client,CAT_LABEL[s.cat],s.lotId?lotLabel(s.lotId):animalLabel(s.animalId),s.qte,s.poids,s.prixUnit,s.remise,salesNet(s),s.encaisse,salesNet(s)-s.encaisse,s.mode,s.resp]})))},
+  depenses:function(){return csv([['Date','Catégorie','Montant (FCFA)','Lot','Note']].concat(by(S.expenses,'date').map(function(x){return[x.date,x.cat,x.montant,x.lotId?lotLabel(x.lotId):'Charge commune',x.note]})))},
+  pesees:function(){return csv([['Date','Lot ou animal','Animaux pesés','Poids moyen (g)']].concat(by(S.weighings,'date').map(function(w){return[w.date,w.lotId?lotLabel(w.lotId):animalLabel(w.animalId),w.n||'',w.g]})))},
+  mortalites:function(){return csv([['Date','Lot ou animal','Nombre','Cause']].concat(by(S.events.filter(function(e){return e.type==='mort'}),'date').map(function(e){return[e.date,e.lotId?lotLabel(e.lotId):animalLabel(e.animalId),e.n,e.cause]})))}};
+ACT.exp=function(d){saveFile(d.k+'-'+today()+'.csv',EXPORTS[d.k]())};
+ACT.backup=function(){saveFile('sauvegarde-nouvelle-ferme-'+today()+'.json',JSON.stringify(S),function(){S.lastBackup=new Date().toISOString();save();render()})};
+function restoreFrom(text){
+  var o;try{o=JSON.parse(text)}catch(e){return toast('Fichier illisible')}
+  if(!o||o.v!==1||!Array.isArray(o.animals)||!Array.isArray(o.lots)||!o.settings)return toast('Ce fichier n’est pas une sauvegarde valide');
+  confirmSheet('Remplacer toutes les données actuelles par cette sauvegarde ('+o.animals.length+' animaux, '+o.lots.length+' lots, '+(o.sales||[]).length+' ventes) ?',function(){
+    var d=defaults();Object.keys(d).forEach(function(k){if(o[k]===undefined)o[k]=d[k]});S=o;logOp('Sauvegarde restaurée');commit('Sauvegarde restaurée')},'Restaurer')}
+document.addEventListener('change',function(e){
+  if(e.target.id!=='restoreFile')return;var f=e.target.files&&e.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){restoreFrom(String(r.result))};r.onerror=function(){toast('Lecture impossible')};r.readAsText(f)});
+ACT.restorePaste=function(){var t=$('#pasteBox');if(t&&t.value.trim())restoreFrom(t.value);else toast('Collez d’abord la sauvegarde')};
+ACT.settings=function(){
+  var lb=S.lastBackup?'le '+fdate(S.lastBackup.slice(0,10)):'jamais';
+  var h='<h2>Paramètres et sauvegarde</h2><div class="btns"><button class="btn pri" data-act="editSettings">Modifier les paramètres</button></div>'+
+  '<h3 style="margin-top:18px;font-size:16px">Sauvegarde</h3><p class="small">Les données sont enregistrées sur cet appareil et restent disponibles sans Internet. Dernière sauvegarde : '+lb+'. Faites-en une régulièrement : si les données du navigateur sont effacées, elles sont perdues.</p>'+
+  '<div class="btns"><button class="btn" data-act="backup">Exporter une sauvegarde</button><label class="btn" style="display:inline-flex;align-items:center">Restaurer un fichier<input type="file" id="restoreFile" accept=".json,application/json" hidden></label></div>'+
+  '<details style="margin-top:10px"><summary class="small">Restaurer en collant le texte</summary><textarea id="pasteBox" placeholder="Collez ici le contenu de la sauvegarde" style="margin-top:8px"></textarea><div class="btns"><button class="btn sm" data-act="restorePaste">Restaurer</button></div></details>'+
+  '<h3 style="margin-top:18px;font-size:16px">Rapports</h3><p class="small">Ventes, dépenses, bilan par lot, pesées, mortalités, reproduction, santé, stock et fiches, en PDF ou en CSV.</p><div class="btns"><button class="btn" data-act="reports">Ouvrir les rapports</button></div>'+
+  '<h3 style="margin-top:18px;font-size:16px">Journal des opérations</h3>'+(S.log.length?'<div class="card">'+S.log.slice(0,12).map(function(x){return kv(esc(x.t),'<span class="small">'+fdate(x.d.slice(0,10))+'</span>')}).join('')+'</div>':'<div class="small">Rien d’enregistré pour l’instant.</div>')+
+  '<div class="btns"><button class="btn" data-act="close">Fermer</button></div>';
+  openSheet(h)};
+ACT.editSettings=function(){
+  var c=cfg(),t=c.tranches;
+  var f=[{k:'ferme',l:'Nom de la ferme'},{k:'cibleCarcasse',l:'Poids de carcasse visé',hint:'kg',t:'number',req:1,half:1},{k:'rendement',l:'Rendement attendu',hint:'%',t:'number',req:1,half:1},
+    {k:'gestation',l:'Gestation',hint:'jours',t:'number',step:'1',req:1,half:1},{k:'palpation',l:'Palpation après',hint:'jours',t:'number',step:'1',req:1,half:1},
+    {k:'sevrage',l:'Sevrage après',hint:'jours',t:'number',step:'1',req:1,half:1},{k:'intervallePesee',l:'Pesée tous les',hint:'jours',t:'number',step:'1',req:1,half:1},
+    {k:'prixAliment',l:'Prix de l’aliment',hint:'FCFA par kg',t:'number',req:1},
+    {k:'repartition',l:'Charges communes',t:'select',opts:[['effectif','Réparties selon l’effectif initial des lots'],['aucune','Non réparties entre les lots']]},
+    {k:'p_vif',l:'Prix lapin vivant',hint:'FCFA',t:'number',half:1},{k:'p_abattu',l:'Prix lapin abattu',hint:'FCFA',t:'number',half:1},
+    {k:'p_reproducteur',l:'Prix reproducteur',hint:'FCFA',t:'number',half:1},{k:'p_sevre',l:'Prix lapereau sevré',hint:'FCFA',t:'number',half:1},
+    {k:'t1',l:'Tranche 1 : moins de',hint:'kg',t:'number',half:1},{k:'q1',l:'Prix tranche 1',hint:'FCFA',t:'number',half:1},
+    {k:'t2',l:'Tranche 2 : moins de',hint:'kg',t:'number',half:1},{k:'q2',l:'Prix tranche 2',hint:'FCFA',t:'number',half:1},
+    {k:'t3',l:'Tranche 3 : moins de',hint:'kg',t:'number',half:1},{k:'q3',l:'Prix tranche 3',hint:'FCFA',t:'number',half:1},
+    {k:'q4',l:'Prix tranche 4 (au-delà)',hint:'FCFA',t:'number'}];
+  var v={ferme:c.ferme,cibleCarcasse:c.cibleCarcasse,rendement:c.rendement,gestation:c.gestation,palpation:c.palpation,sevrage:c.sevrage,intervallePesee:c.intervallePesee,prixAliment:c.prixAliment,repartition:c.repartition,
+    p_vif:c.prix.vif,p_abattu:c.prix.abattu,p_reproducteur:c.prix.reproducteur,p_sevre:c.prix.sevre,t1:t[0].max,q1:t[0].prix,t2:t[1].max,q2:t[1].prix,t3:t[2].max,q3:t[2].prix,q4:t[3].prix};
+  form('Paramètres',f,v,function(x){
+    if(x.rendement<20||x.rendement>90)return 'Le rendement attendu doit rester entre 20 et 90 %.';
+    if(!(x.t1>0&&x.t2>x.t1&&x.t3>x.t2))return 'Les limites de tranches doivent être croissantes.';
+    c.ferme=x.ferme||c.ferme;c.cibleCarcasse=x.cibleCarcasse;c.rendement=x.rendement;c.gestation=x.gestation;c.palpation=x.palpation;c.sevrage=x.sevrage;c.intervallePesee=x.intervallePesee;c.prixAliment=x.prixAliment;c.repartition=x.repartition;
+    c.prix={vif:x.p_vif||0,abattu:x.p_abattu||0,reproducteur:x.p_reproducteur||0,sevre:x.p_sevre||0};
+    c.tranches=[{min:0,max:x.t1,prix:x.q1||0},{min:x.t1,max:x.t2,prix:x.q2||0},{min:x.t2,max:x.t3,prix:x.q3||0},{min:x.t3,max:99,prix:x.q4||0}];
+    logOp('Paramètres modifiés');commit('Paramètres enregistrés')},
+    {intro:'Les prix et tranches affichés au départ sont des exemples. Remplacez-les par vos tarifs réels.'})};
+
+/* ---------- affichage ---------- */
+function render(){
+  renderTabs();
+  var f={home:vHome,cheptel:vCheptel,croiss:vCroiss,repro:vRepro,argent:vArgent}[UI.tab];
+  $('#view').innerHTML=f();
+  $('header.top h1').textContent=cfg().ferme||'Nouvelle Ferme';
+  var on=navigator.onLine!==false;
+  $('#dot').className='dot'+(on?'':' off');
+  $('#status').textContent=(on?'En ligne':'Hors ligne')+' · données sur cet appareil'+(storageOk?'':' · NON ENREGISTRÉES')}
+window.addEventListener('online',render);window.addEventListener('offline',render);
+$('#gear').addEventListener('click',ACT.settings);
+save();render();
+})();
+</script>
+
+<script>
+(function(){
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+  var standalone=window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+  var ios=/iphone|ipad|ipod/i.test(navigator.userAgent),hidden=false;
+  try{hidden=localStorage.getItem('nfcp-install-hidden')==='1'}catch(e){}
+  if(!standalone&&ios&&!hidden){
+    var b=document.createElement('div');b.className='banner';
+    b.innerHTML='<b>Installer l’application.</b> Dans Safari, touchez le bouton Partager, puis « Sur l’écran d’accueil ».<div class="btns" style="margin-top:8px"><button class="btn sm" id="hideInstall" type="button">Masquer</button></div>';
+    var v=document.getElementById('view');v.parentNode.insertBefore(b,v);
+    b.querySelector('#hideInstall').addEventListener('click',function(){try{localStorage.setItem('nfcp-install-hidden','1')}catch(e){};b.remove()});
+  }
+})();
+</script>
+</body>
+</html>
